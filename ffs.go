@@ -61,6 +61,10 @@ type AuthToken struct {
 
 //TODO Determine if I want to provide the API URLs or if they should be provided as constants here.
 
+/*
+GetAuthData - Function to get the Authentication data (mainly the authentication token) which will be needed for the rest of the API calls
+The authentication token is good for up to 1 hour before it expires
+ */
 func GetAuthData(uri string, username string, password string) (*AuthData,error) {
 	//Build HTTP GET request
 	req, err := http.NewRequest("GET", uri, nil)
@@ -103,4 +107,20 @@ func GetAuthData(uri string, username string, password string) (*AuthData,error)
 
 	//Return AuthData
 	return &authData,nil
+}
+
+//TODO create Global Function for calling getFileEvents with CSV url formatting (Priority, as will likely continue to be supported by Code42)
+
+//TODO create Global Function for calling getFileEvents with JSON url formatting (this may be deprecated by Code42 soon)
+
+/*
+getFileEvents - Function to get the actual event records from FFS
+ */
+
+//TODO Investigate Below
+/*
+How to handle the wide variety of query customizability (if it should be handled at all)
+ */
+func getFileEvents(authData AuthData) (*[]FileEvent,error) {
+	return nil,nil
 }
