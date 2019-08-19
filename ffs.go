@@ -4,15 +4,20 @@ package ffs
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 )
 
 //The main body of a file event record
 type FileEvent struct {
 	EventId						string			`json:"eventId"`
 	EventType					string			`json:"eventType"`
-	EventTimestamp				string			`json:"eventTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
-	InsertionTimestamp			string			`json:"insertionTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
+	EventTimestamp				time.Time		`json:"eventTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
+	InsertionTimestamp			time.Time		`json:"insertionTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
 	FilePath					string			`json:"filePath"`
 	FileName					string			`json:"fileName"`
 	FileType					string			`json:"fileType"`
@@ -21,22 +26,22 @@ type FileEvent struct {
 	FileOwner					string			`json:"fileOwner,omitempty"`
 	Md5Checksum					string			`json:"md5Checksum,omitempty"`
 	Sha256Checksum				string			`json:"sha256Checksum,omitempty"`
-	CreatedTimestamp			string			`json:"createdTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
-	ModifyTimestamp				string			`json:"modifyTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
+	CreatedTimestamp			time.Time		`json:"createdTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
+	ModifyTimestamp				time.Time		`json:"modifyTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
 	DeviceUserName				string			`json:"deviceUserName"`
-	DeviceStatus				string			`json:"deviceStatus,omitempty"`
+	DeviceUid					string			`json:"deviceUid"`
+	UserUid						string			`json:"userUid"`
 	OsHostName					string			`json:"osHostName"`
 	DomainName					string			`json:"domainName"`
 	PublicIpAddress				string			`json:"publicIpAddress,omitempty"`
 	PrivateIpAddresses			[]string		`json:"privateIpAddresses"` //Array of IP address strings
-	DeviceUid					string			`json:"deviceUid"`
-	UserUid						string			`json:"userUid"`
 	Actor						string			`json:"actor,omitempty"`
 	DirectoryId					[]string		`json:"directoryId,omitempty"` //An array of something, I am not sure
 	Source						string			`json:"source"`
 	Url							string			`json:"url,omitempty"`
 	Shared						string			`json:"shared,omitempty"`
 	SharedWith					[]string		`json:"sharedWith,omitempty"` //An array of strings (Mainly Email Addresses)
+	SharingTypeAdded			[]string		`json:"sharingTypeAdded,omitempty"`
 	CloudDriveId				string			`json:"cloudDriveId,omitempty"`
 	DetectionSourceAlias		string			`json:"detectionSourceAlias,omitempty"`
 	FileId						string			`json:"fileId,omitempty"`
@@ -110,6 +115,217 @@ func GetAuthData(uri string, username string, password string) (*AuthData,error)
 }
 
 //TODO create Global Function for calling getFileEvents with CSV url formatting (Priority, as will likely continue to be supported by Code42)
+/*
+csvLineToFileEvent - Converts a CSV Line into a File Event Struct
+[]string - csv line. DO NOT PASS Line 0 (Headers) if they exist
+ */
+func csvLineToFileEvent(csvLine []string) FileEvent {
+	//Convert []string to designated variables
+	eventId := csvLine[0]
+	eventType := csvLine[1]
+	eventTimestampString := csvLine[2] //Converted to time below
+	insertionTimestampString := csvLine[3] //Converted to time below
+	filePath := csvLine[4]
+	fileName := csvLine[5]
+	fileType := csvLine[6]
+	fileCategory := csvLine[7]
+	fileSizeString := csvLine[8] //Converted to int below
+	fileOwner := csvLine[9]
+	md5Checksum := csvLine[10]
+	sha256Checksum := csvLine[11]
+	createdTimestampString := csvLine[12] //Converted to time below
+	modifyTimestampString := csvLine[13] //Converted to time below
+	deviceUserName := csvLine[14]
+	deviceUid := csvLine[15]
+	userUid := csvLine[16]
+	osHostName := csvLine[17]
+	domainName := csvLine[18]
+	publicIpAddress := csvLine[19]
+	privateIpAddressesString := csvLine[20] //Converted to slice below
+	actor := csvLine[21]
+	directoryIdString := csvLine[22] //Converted to slice below
+	source := csvLine[23]
+	url := csvLine[24]
+	shared := csvLine[25]
+	sharedWithString := csvLine[26] //Converted to slice below
+	sharingTypeAddedString := csvLine[27] //Converted to slice below
+	cloudDriveId := csvLine[28]
+	detectionSourceAlias := csvLine[29]
+	fileId := csvLine[30]
+	exposureString := csvLine[31] //Convert to slice below
+	processOwner := csvLine[32]
+	processName := csvLine[33]
+	removableMediaVendor := csvLine[34]
+	removableMediaName := csvLine[35]
+	removableMediaSerialNumber := csvLine[36]
+	removableMediaCapacityString := csvLine[37] //Converted to int below
+	removableMediaBusType := csvLine[38]
+	syncDestination := csvLine[39]
+
+
+	//Set err
+	var err error
+
+	//Convert eventTimeStamp to time
+	var eventTimeStamp time.Time
+	if eventTimestampString != "" {
+		eventTimeStamp, err = time.Parse(time.RFC3339Nano, eventTimestampString)
+
+		//Panic if this fails, that means something is wrong with CSV handling
+		if err != nil {
+			log.Println("Error parsing eventTimeStampString, something must be wrong with CSV parsing.")
+			log.Println(csvLine)
+			panic(err)
+		}
+	}
+
+	//Convert insertionTimestamp to time
+	var insertionTimestamp time.Time
+	if insertionTimestampString != "" {
+		insertionTimestamp, err = time.Parse(time.RFC3339Nano, insertionTimestampString)
+
+		//Panic if this fails, that means something is wrong with CSV handling
+		if err != nil {
+			log.Println("Error parsing insertionTimestampString, something must be wrong with CSV parsing.")
+			log.Println(csvLine)
+			panic(err)
+		}
+	}
+
+	//Convert fileSizeString to int
+	var fileSize int
+	if fileSizeString != "" {
+		fileSize, err = strconv.Atoi(fileSizeString)
+
+		//Panic if this fails, that means something is wrong with CSV handling
+		if err != nil {
+			log.Println("Error parsing fileSizeString, something must be wrong with CSV parsing.")
+			log.Println(csvLine)
+			panic(err)
+		}
+	}
+
+	//Convert createdTimestamp to time
+	var createdTimestamp time.Time
+	if createdTimestampString != "" {
+		createdTimestamp, err = time.Parse(time.RFC3339Nano, createdTimestampString)
+
+		//Panic if this fails, that means something is wrong with CSV handling
+		if err != nil {
+			log.Println("Error parsing createdTimestampString, something must be wrong with CSV parsing.")
+			log.Println(csvLine)
+			panic(err)
+		}
+	}
+
+	//Convert modifyTimestamp to time
+	var modifyTimestamp time.Time
+	if modifyTimestampString != "" {
+		modifyTimestamp, err = time.Parse(time.RFC3339Nano, modifyTimestampString)
+
+		//Panic if this fails, that means something is wrong with CSV handling
+		if err != nil {
+			log.Println("Error parsing modifyTimestampString, something must be wrong with CSV parsing.")
+			log.Println(csvLine)
+			panic(err)
+		}
+	}
+
+	//Convert privateIpAddresses to string slice
+	var privateIpAddresses []string
+	if privateIpAddressesString != "" {
+		privateIpAddressesString := strings.Replace(privateIpAddressesString, "\n","",-1)
+		privateIpAddresses = strings.Fields(privateIpAddressesString)
+	}
+
+	//Convert directoryId to string slice
+	var directoryId []string
+	if directoryIdString != "" {
+		directoryIdString := strings.Replace(directoryIdString, "\n","",-1)
+		directoryId = strings.Fields(directoryIdString)
+	}
+
+	//Convert sharedWith to string slice
+	var sharedWith []string
+	if sharedWithString != "" {
+		sharedWithString := strings.Replace(sharedWithString, "\n","",-1)
+		sharedWith = strings.Fields(sharedWithString)
+	}
+
+	//Convert sharingTypeAdded to string slice
+	var sharingTypeAdded []string
+	if sharingTypeAddedString != "" {
+		sharingTypeAddedString := strings.Replace(sharingTypeAddedString, "\n","",-1)
+		sharingTypeAdded = strings.Fields(sharingTypeAddedString)
+	}
+
+	//Convert exposure to string slice
+	var exposure []string
+	if exposureString != "" {
+		exposureString := strings.Replace(exposureString, "\n","",-1)
+		exposure = strings.Fields(exposureString)
+	}
+
+	//Convert removableMediaCapacity to int
+	var removableMediaCapacity int
+	if removableMediaCapacityString != "" {
+		removableMediaCapacity, err = strconv.Atoi(removableMediaCapacityString)
+
+		//Panic if this fails, that means something is wrong with CSV handling
+		if err != nil {
+			log.Println("Error parsing removableMediaCapacityString, something must be wrong with CSV parsing.")
+			log.Println(csvLine)
+			panic(err)
+		}
+	}
+
+	var fileEvent FileEvent
+
+	fileEvent = FileEvent{
+		EventId:                    eventId,
+		EventType:                  eventType,
+		EventTimestamp:             eventTimeStamp,
+		InsertionTimestamp:         insertionTimestamp,
+		FilePath:                   filePath,
+		FileName:                   fileName,
+		FileType:                   fileType,
+		FileCategory:               fileCategory,
+		FileSize:                   fileSize,
+		FileOwner:                  fileOwner,
+		Md5Checksum:                md5Checksum,
+		Sha256Checksum:             sha256Checksum,
+		CreatedTimestamp:           createdTimestamp,
+		ModifyTimestamp:            modifyTimestamp,
+		DeviceUserName:             deviceUserName,
+		DeviceUid:                  deviceUid,
+		UserUid:                    userUid,
+		OsHostName:                 osHostName,
+		DomainName:                 domainName,
+		PublicIpAddress:            publicIpAddress,
+		PrivateIpAddresses:         privateIpAddresses,
+		Actor:                      actor,
+		DirectoryId:                directoryId,
+		Source:                     source,
+		Url:                        url,
+		Shared:                     shared,
+		SharedWith:                 sharedWith,
+		SharingTypeAdded:           sharingTypeAdded,
+		CloudDriveId:               cloudDriveId,
+		DetectionSourceAlias:       detectionSourceAlias,
+		FileId:                     fileId,
+		Exposure:                   exposure,
+		ProcessOwner:               processOwner,
+		ProcessName:                processName,
+		RemovableMediaVendor:       removableMediaVendor,
+		RemovableMediaName:         removableMediaName,
+		RemovableMediaSerialNumber: removableMediaSerialNumber,
+		RemovableMediaCapacity:     removableMediaCapacity,
+		RemovableMediaBusType:      removableMediaBusType,
+		SyncDestination:            syncDestination,
+	}
+
+	return fileEvent
+}
 
 //TODO create Global Function for calling getFileEvents with JSON url formatting (this may be deprecated by Code42 soon)
 
