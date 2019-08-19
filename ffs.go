@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -337,6 +336,6 @@ getFileEvents - Function to get the actual event records from FFS
 /*
 How to handle the wide variety of query customizability (if it should be handled at all)
  */
-func getFileEvents(authData AuthData, ffsURI string) (*[]FileEvent,error) {
+func GetFileEvents(authData AuthData, ffsURI string, jsonQuery string) (*[]FileEvent,error) {
 	return nil,nil
 }
