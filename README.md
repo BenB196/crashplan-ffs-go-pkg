@@ -1,7 +1,7 @@
 # crashplan-ffs-go-module
 A third-party Golang module for Code42's Crashplan Forensic File Search (FFS) API
 
-The goal of this Golang module is to provide an easy to use/integrate module for Code 42's Crashplan FFS API. There are two main functions that can be used within the module:
+The goal of this Golang module is to provide an easy to use/integrate module for Code42's Crashplan FFS API. There are two main functions that can be used within the module:
 
 1. GetAuthData
 2. GetFileEvents
@@ -34,8 +34,8 @@ The GetFileEvents is intended to gather all events for a passed query and return
 
 Arguments:
 - authData -  This is the Golang struct which is gotten from the GetAuthData function.
-- ffsURI - This is the URL which actually hosts the FFS API. (See Code 42 documentation for URI, default is https://forensicsearch-default.prod.ffs.us2.code42.com/forensic-search/queryservice/api/v1/)
-- jsonQuery - This is the properly formatted JSON Query string which is what is actually executed against the Code 42 Crashplan FFS API. (See documentation for how to properly format these queries.)
+- ffsURI - This is the URL which actually hosts the FFS API. (See Code42 documentation for URI, default is https://forensicsearch-default.prod.ffs.us2.code42.com/forensic-search/queryservice/api/v1/)
+- jsonQuery - This is the properly formatted JSON Query string which is what is actually executed against the Code42 Crashplan FFS API. (See documentation for how to properly format these queries.)
   - Example JSON query (Returns all events within a 5 second delta)
 ```
 {
@@ -121,14 +121,14 @@ FileEvent
 
 Limitations:
 
-Code 42 Crashplan FFS API has limitations like most APIs, these limitations affect the GetFileEvents function:
+Code42 Crashplan FFS API has limitations like most APIs, these limitations affect the GetFileEvents function:
 
 1. 120 Queries per minute, any additional queries will be dropped. (never actually bothered to test if this limit is actually enforced)
 2. 200,000 results returned per query. This limitation is kind of annoying to handle as there is no easy way to handle it. The API does not support paging and the only way to figure out how many results there is for a query is to first query, count, then if over 200,000 results, break up the query into smaller time increments and perform multiple queries  to get all of the results.
 
-## Code 42 Documentation
+## Code42 Documentation
 
-Links for Code 42 Documentation
+Links for Code42 Documentation
 
 - [Crashplan FFS API Documentation](https://support.code42.com/Administrator/Cloud/Monitoring_and_managing/Forensic_File_Search_API)
 
