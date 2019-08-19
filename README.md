@@ -13,7 +13,7 @@ The GetAuthData is intended to get an API token for a user that will last for on
 
 Arguments:
 - uri - This is the URL which will provide the API token. (I believe it will always be: https://www.crashplan.com/c42api/v3/auth/jwt?useBody=true)
-- username -  The username of the account that has permissions to access the FFS API. (This must be an email address (though its not actually validated))
+- username -  The username of the account that has permissions to access the FFS API. (This must be an email address according to the API)
 - password -  The password of the account that is set as the username.
 
 Returns:
