@@ -1,5 +1,5 @@
 # crashplan-ffs-go-module
-A golang module for Code42's Crashplan Forensic File Search (FFS) API
+A third-party Golang module for Code42's Crashplan Forensic File Search (FFS) API
 
 The goal of this Golang module is to provide an easy to use/integrate module for Code 42's Crashplan FFS API. There are two main functions that can be used within the module:
 
