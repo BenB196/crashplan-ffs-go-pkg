@@ -2,6 +2,8 @@
 package ffs
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"log"
@@ -75,7 +77,7 @@ func GetAuthData(uri string, username string, password string) (*AuthData,error)
 
 	//Return nil and err if Building of HTTP GET request fails
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	//Set Basic Auth Header
@@ -88,14 +90,14 @@ func GetAuthData(uri string, username string, password string) (*AuthData,error)
 
 	//Return nil and err if Building of HTTP GET request fails
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 
 	//Return err if status code != 200
 	if resp.StatusCode != http.StatusOK {
-		return nil,errors.New("Error with Authentication Token GET: " + resp.Status)
+		return nil, errors.New("Error with Authentication Token GET: " + resp.Status)
 	}
 
 	//Create AuthData variable
@@ -106,17 +108,18 @@ func GetAuthData(uri string, username string, password string) (*AuthData,error)
 
 	//Return nil and err if decoding of resp.Body fails
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	//Return AuthData
-	return &authData,nil
+	return &authData, nil
 }
 
 //TODO create Global Function for calling getFileEvents with CSV url formatting (Priority, as will likely continue to be supported by Code42)
 /*
 csvLineToFileEvent - Converts a CSV Line into a File Event Struct
 []string - csv line. DO NOT PASS Line 0 (Headers) if they exist
+This function contains panics in order to prevent messed up CSV parsing
  */
 func csvLineToFileEvent(csvLine []string) FileEvent {
 	//Convert []string to designated variables
@@ -337,5 +340,76 @@ getFileEvents - Function to get the actual event records from FFS
 How to handle the wide variety of query customizability (if it should be handled at all)
  */
 func GetFileEvents(authData AuthData, ffsURI string, jsonQuery string) (*[]FileEvent,error) {
-	return nil,nil
+
+	//Validate jsonQuery is valid JSON
+	var js map[string]interface{}
+	if jsonQuery == "" {
+		return nil, errors.New("jsonQuery cannot be empty")
+	} else if !(json.Unmarshal([]byte(jsonQuery), &js) == nil) {
+		return nil, errors.New("jsonQuery is not in a valid json format")
+	}
+
+	//Make sure authData token is not ""
+	if authData.Data.V3UserToken == "" {
+		return nil, errors.New("authData cannot be nil")
+	}
+
+	//Query ffsURI with authData API token and jsonQuery body
+	req, err := http.NewRequest("POST", ffsURI, bytes.NewReader([]byte(jsonQuery)))
+
+	//Handle request errors
+	if err != nil {
+		return nil, err
+	}
+
+	//Set request headers
+	req.Header.Set("Content-Type","application/json")
+	req.Header.Set("Authorization","v3_user_token " + authData.Data.V3UserToken)
+
+	//Get Response
+	resp, err := http.DefaultClient.Do(req)
+
+	//Handle response errors
+	if err != nil {
+		return nil, err
+	}
+
+	//defer body close
+	defer resp.Body.Close()
+
+	//Make sure http status code is 200
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("Error with gathering file events POST: " + resp.Status)
+	}
+
+	//Read Response Body as CSV
+	reader := csv.NewReader(resp.Body)
+	reader.Comma = ','
+
+	//Read body into variable
+	data, err := reader.ReadAll()
+
+	//Handle reader errors
+	if err != nil {
+		return nil, err
+	}
+
+	var fileEvents []FileEvent
+
+	//Loop through CSV lines
+	for lineNumber, lineContent := range data {
+		if lineNumber != 0 {
+			//Convert CSV line to file events and add to slice
+			fileEvents = append(fileEvents, csvLineToFileEvent(lineContent))
+		} else {
+			//Validate that the correct number of columns is in the header line, if not panic, they changed the API
+			//Current known number of columns
+			numberOfColumns := 40
+			if len(lineContent) != numberOfColumns {
+				panic(errors.New("number of columns in CSV file does not match expected number, API changed, panicking to keep data integrity"))
+			}
+		}
+	}
+
+	return &fileEvents,nil
 }
