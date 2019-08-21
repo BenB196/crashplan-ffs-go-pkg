@@ -71,13 +71,13 @@ type AuthToken struct {
 GetAuthData - Function to get the Authentication data (mainly the authentication token) which will be needed for the rest of the API calls
 The authentication token is good for up to 1 hour before it expires
  */
-func GetAuthData(uri string, username string, password string) (*AuthData,error) {
+func GetAuthData(uri string, username string, password string) (AuthData,error) {
 	//Build HTTP GET request
 	req, err := http.NewRequest("GET", uri, nil)
 
 	//Return nil and err if Building of HTTP GET request fails
 	if err != nil {
-		return nil, err
+		return AuthData{}, err
 	}
 
 	//Set Basic Auth Header
@@ -90,14 +90,14 @@ func GetAuthData(uri string, username string, password string) (*AuthData,error)
 
 	//Return nil and err if Building of HTTP GET request fails
 	if err != nil {
-		return nil, err
+		return AuthData{}, err
 	}
 
 	defer resp.Body.Close()
 
 	//Return err if status code != 200
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("Error with Authentication Token GET: " + resp.Status)
+		return AuthData{}, errors.New("Error with Authentication Token GET: " + resp.Status)
 	}
 
 	//Create AuthData variable
@@ -108,11 +108,11 @@ func GetAuthData(uri string, username string, password string) (*AuthData,error)
 
 	//Return nil and err if decoding of resp.Body fails
 	if err != nil {
-		return nil, err
+		return AuthData{}, err
 	}
 
 	//Return AuthData
-	return &authData, nil
+	return authData, nil
 }
 
 //TODO create Global Function for calling getFileEvents with CSV url formatting (Priority, as will likely continue to be supported by Code42)
@@ -339,7 +339,7 @@ getFileEvents - Function to get the actual event records from FFS
 /*
 How to handle the wide variety of query customizability (if it should be handled at all)
  */
-func GetFileEvents(authData AuthData, ffsURI string, jsonQuery string) (*[]FileEvent,error) {
+func GetFileEvents(authData AuthData, ffsURI string, jsonQuery string) ([]FileEvent,error) {
 
 	//Validate jsonQuery is valid JSON
 	var js map[string]interface{}
@@ -411,5 +411,5 @@ func GetFileEvents(authData AuthData, ffsURI string, jsonQuery string) (*[]FileE
 		}
 	}
 
-	return &fileEvents,nil
+	return fileEvents,nil
 }
