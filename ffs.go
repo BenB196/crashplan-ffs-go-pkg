@@ -210,7 +210,7 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 	//Convert createdTimestamp to time
 	var createdTimestamp time.Time
 	if createdTimestampString != "" {
-		createdTimestamp, err = time.Parse(time.RFC3339Nano, createdTimestampString)
+		createdTimestamp, err = time.Parse("2006-01-02 15:04:05", createdTimestampString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -223,7 +223,7 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 	//Convert modifyTimestamp to time
 	var modifyTimestamp time.Time
 	if modifyTimestampString != "" {
-		modifyTimestamp, err = time.Parse(time.RFC3339Nano, modifyTimestampString)
+		modifyTimestamp, err = time.Parse("2006-01-02 15:04:05", modifyTimestampString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
