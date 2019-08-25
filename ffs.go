@@ -68,7 +68,7 @@ type AuthToken struct {
 //Structs for FFS Queries
 type Query struct {
 	Groups 			[]Group 	`json:"groups"`
-	GroupClause 	string 		`json:"groupClause"`
+	GroupClause 	string 		`json:"groupClause,omitempty"`
 	PgNum 			int 		`json:"pgNum,omitempty"`
 	PgSize 			int 		`json:"pgSize,omitempty"`
 	SrtDir 			string 		`json:"srtDir,omitempty"`
@@ -77,7 +77,7 @@ type Query struct {
 
 type Group struct {
 	Filters 		[]Filter 	`json:"filters"`
-	FilterClause 	string 		`json:"filterClause"`
+	FilterClause 	string 		`json:"filterClause,omitempty"`
 }
 
 type Filter struct {

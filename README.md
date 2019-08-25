@@ -73,7 +73,7 @@ Arguments:
 #Query Struct format
 Query
 	Groups 		    []Group
-	GroupClause     string
+	GroupClause     string      (optional)
 	PgNum 		    int         (optional)
 	PgSize 		    int         (optional)
 	SrtDir 		    string      (optional)
@@ -82,7 +82,7 @@ Query
 
 Group
 	Filters 	    []Filter
-    FilterClause 	string
+    FilterClause 	string      (optional)
 }
 
 Filter
