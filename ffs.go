@@ -65,6 +65,26 @@ type AuthToken struct {
 	V3UserToken string `json:"v3_user_token"`
 }
 
+//Structs for FFS Queries
+type Query struct {
+	Groups 		[]Group `json:"groups"`
+	GroupClause string 	`json:"groupClause"`
+	PgNum 		int 	`json:"pgNum,omitempty"`
+	PgSize 		int 	`json:"pgSize,omitempty"`
+	SrtDir 		string 	`json:"srtDir,omitempty"`
+	SrtKey 		string 	`json:"srtKey,omitempty"`
+}
+
+type Group struct {
+	Filters 	[]Filter `json:"filters"`
+}
+
+type Filter struct {
+	Operator 	string `json:"operator"`
+	Term 		string `json:"term"`
+	Value 		string `json:"value"`
+}
+
 //TODO Determine if I want to provide the API URLs or if they should be provided as constants here.
 
 /*
@@ -339,13 +359,11 @@ getFileEvents - Function to get the actual event records from FFS
 /*
 How to handle the wide variety of query customizability (if it should be handled at all)
  */
-func GetFileEvents(authData AuthData, ffsURI string, jsonQuery string) ([]FileEvent,error) {
+func GetFileEvents(authData AuthData, ffsURI string, query Query) ([]FileEvent,error) {
 
 	//Validate jsonQuery is valid JSON
-	var js map[string]interface{}
-	if jsonQuery == "" {
-		return nil, errors.New("jsonQuery cannot be empty")
-	} else if !(json.Unmarshal([]byte(jsonQuery), &js) == nil) {
+	ffsQuery, err := json.Marshal(query)
+	if err != nil {
 		return nil, errors.New("jsonQuery is not in a valid json format")
 	}
 
@@ -355,7 +373,7 @@ func GetFileEvents(authData AuthData, ffsURI string, jsonQuery string) ([]FileEv
 	}
 
 	//Query ffsURI with authData API token and jsonQuery body
-	req, err := http.NewRequest("POST", ffsURI, bytes.NewReader([]byte(jsonQuery)))
+	req, err := http.NewRequest("POST", ffsURI, bytes.NewReader(ffsQuery))
 
 	//Handle request errors
 	if err != nil {

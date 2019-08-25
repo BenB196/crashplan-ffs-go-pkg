@@ -35,9 +35,11 @@ The GetFileEvents is intended to gather all events for a passed query and return
 Arguments:
 - authData -  This is the Golang struct which is gotten from the GetAuthData function.
 - ffsURI - This is the URL which actually hosts the FFS API. (See Code42 documentation for URI, default is https://forensicsearch-default.prod.ffs.us2.code42.com/forensic-search/queryservice/api/v1/)
-- jsonQuery - This is the properly formatted JSON Query string which is what is actually executed against the Code42 Crashplan FFS API. (See documentation for how to properly format these queries.)
+- query - This is the properly formatted FFS Query struct which is what is actually executed against the Code42 Crashplan FFS API. (See documentation for how to properly format these queries.)
   - Example JSON query (Returns all events within a 5 second delta)
+
 ```
+#Json Format
 {
     "groups":[
        {
@@ -66,6 +68,26 @@ Arguments:
     "pgSize":100,
     "srtDir":"asc",
     "srtKey":"insertionTimestamp"
+}
+
+#Query Struct format
+Query
+	Groups 		[]Group
+	GroupClause string
+	PgNum 		int
+	PgSize 		int
+	SrtDir 		string
+	SrtKey 		string
+}
+
+Group
+	Filters 	[]Filter
+}
+
+Filter
+	Operator 	string
+	Term 		string
+	Value 		string
 }
   ```
 Returns:
