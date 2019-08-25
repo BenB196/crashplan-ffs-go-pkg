@@ -57,6 +57,8 @@ type FileEvent struct {
 	SyncDestination				string			`json:"syncDestination,omitempty"`
 }
 
+var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date Inserted (UTC)", "File path", "Filename", "File type", "File Category", "File size (bytes)", "File Owner", "MD5 Hash", "SHA-256 Hash", "Create Date", "Modified Date", "Username", "Device ID", "User UID", "Hostname", "Fully Qualified Domain Name", "IP address (public)", "IP address (private)", "Actor", "Directory ID", "Source", "URL", "Shared", "Shared With", "File exposure changed to", "Cloud drive ID", "Detection Source Alias", "File Id", "Exposure Type", "Process Owner", "Process Name", "Removable Media Vendor", "Removable Media Name", "Removable Media Serial Number", "Removable Media Capacity", "Removable Media Bus Type", "Sync Destination"}
+
 //Structs of Crashplan FFS API Authentication Token Return
 type AuthData struct {
 	Data AuthToken `json:"data"`
@@ -421,14 +423,42 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) ([]FileEvent,e
 			//Convert CSV line to file events and add to slice
 			fileEvents = append(fileEvents, csvLineToFileEvent(lineContent))
 		} else {
-			//Validate that the correct number of columns is in the header line, if not panic, they changed the API
-			//Current known number of columns
-			numberOfColumns := 40
-			if len(lineContent) != numberOfColumns {
-				panic(errors.New("number of columns in CSV file does not match expected number, API changed, panicking to keep data integrity"))
+			//Validate that the columns have not changed
+			differences := difference(lineContent, csvHeaders)
+
+			if len(differences) > 0 {
+				panic(errors.New("number of columns in CSV file does not match expected number, API changed, panicking to keep data integrity. columns that changed: " + strings.Join(differences,",")))
 			}
 		}
 	}
 
 	return fileEvents,nil
+}
+
+
+func difference(slice1 []string, slice2 []string) []string {
+	var diff []string
+
+	// Loop two times, first to find slice1 strings not in slice2,
+	// second loop to find slice2 strings not in slice1
+	for i := 0; i < 2; i++ {
+		for _, s1 := range slice1 {
+			found := false
+			for _, s2 := range slice2 {
+				if s1 == s2 {
+					found = true
+					break
+				}
+			}
+			// String not found. We add it to return slice
+			if !found {
+				diff = append(diff, s1)
+			}
+		}
+		// Swap the slices, only if it was the first loop
+		if i == 0 {
+			slice1, slice2 = slice2, slice1
+		}
+	}
+	return diff
 }
