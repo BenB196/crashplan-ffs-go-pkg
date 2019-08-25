@@ -74,10 +74,10 @@ Arguments:
 Query
 	Groups 		[]Group
 	GroupClause string
-	PgNum 		int
-	PgSize 		int
-	SrtDir 		string
-	SrtKey 		string
+	PgNum 		int         (optional)
+	PgSize 		int         (optional)
+	SrtDir 		string      (optional)
+	SrtKey 		string      (optional)
 }
 
 Group
@@ -99,44 +99,44 @@ Returns:
 FileEvent
     EventId                     string	
     EventType                   string	
-    EventTimestamp              time.Time
-    InsertionTimestamp          time.Time
+    EventTimestamp              time.Time       (potentially empty)
+    InsertionTimestamp          time.Time       (potentially empty)
     FilePath                    string	
     FileName                    string	
     FileType                    string	
     FileCategory                string	
     FileSize                    int		
-    FileOwner                   string	
-    Md5Checksum                 string	
-    Sha256Checksum              string	
-    CreatedTimestamp            time.Time
-    ModifyTimestamp             time.Time
+    FileOwner                   string          (potentially empty)
+    Md5Checksum                 string	        (potentially empty)
+    Sha256Checksum              string	        (potentially empty)
+    CreatedTimestamp            time.Time       (potentially empty)
+    ModifyTimestamp             time.Time       (potentially empty)
     DeviceUserName              string	
     DeviceUid                   string	
     UserUid                     string	
     OsHostName                  string	
     DomainName                  string	
-    PublicIpAddress             string	
+    PublicIpAddress             string	        (potentially empty)
     PrivateIpAddresses          []string
-    Actor                       string	
-    DirectoryId                 []string
+    Actor                       string	        (potentially empty)
+    DirectoryId                 []string        (potentially empty)
     Source                      string	
-    Url                         string	
-    Shared                      string	
-    SharedWith                  []string
-    SharingTypeAdded            []string
-    CloudDriveId                string	
-    DetectionSourceAlias        string	
-    FileId                      string	
-    Exposure                    []string
-    ProcessOwner                string	
-    ProcessName                 string	
-    RemovableMediaVendor        string	
-    RemovableMediaName          string	
-    RemovableMediaSerialNumber  string	
-    RemovableMediaCapacity      int		
-    RemovableMediaBusType       string	
-    SyncDestination             string	
+    Url                         string	        (potentially empty)
+    Shared                      string	        (potentially empty)
+    SharedWith                  []string        (potentially empty)
+    SharingTypeAdded            []string        (potentially empty)
+    CloudDriveId                string	        (potentially empty)
+    DetectionSourceAlias        string	        (potentially empty)
+    FileId                      string	        (potentially empty)
+    Exposure                    []string        (potentially empty)
+    ProcessOwner                string	        (potentially empty)
+    ProcessName                 string	        (potentially empty)
+    RemovableMediaVendor        string	        (potentially empty)
+    RemovableMediaName          string	        (potentially empty)
+    RemovableMediaSerialNumber  string	        (potentially empty)
+    RemovableMediaCapacity      int             (potentially empty)
+    RemovableMediaBusType       string	        (potentially empty)
+    SyncDestination             string	        (potentially empty)
 ```
 
 - error - Any errors.
