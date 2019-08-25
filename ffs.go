@@ -67,22 +67,23 @@ type AuthToken struct {
 
 //Structs for FFS Queries
 type Query struct {
-	Groups 		[]Group `json:"groups"`
-	GroupClause string 	`json:"groupClause"`
-	PgNum 		int 	`json:"pgNum,omitempty"`
-	PgSize 		int 	`json:"pgSize,omitempty"`
-	SrtDir 		string 	`json:"srtDir,omitempty"`
-	SrtKey 		string 	`json:"srtKey,omitempty"`
+	Groups 			[]Group 	`json:"groups"`
+	GroupClause 	string 		`json:"groupClause"`
+	PgNum 			int 		`json:"pgNum,omitempty"`
+	PgSize 			int 		`json:"pgSize,omitempty"`
+	SrtDir 			string 		`json:"srtDir,omitempty"`
+	SrtKey 			string 		`json:"srtKey,omitempty"`
 }
 
 type Group struct {
-	Filters 	[]Filter `json:"filters"`
+	Filters 		[]Filter 	`json:"filters"`
+	FilterClause 	string 		`json:"filterClause"`
 }
 
 type Filter struct {
-	Operator 	string `json:"operator"`
-	Term 		string `json:"term"`
-	Value 		string `json:"value"`
+	Operator 		string 		`json:"operator"`
+	Term 			string 		`json:"term"`
+	Value 			string 		`json:"value"`
 }
 
 //TODO Determine if I want to provide the API URLs or if they should be provided as constants here.

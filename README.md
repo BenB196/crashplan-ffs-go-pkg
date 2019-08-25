@@ -72,22 +72,23 @@ Arguments:
 
 #Query Struct format
 Query
-	Groups 		[]Group
-	GroupClause string
-	PgNum 		int         (optional)
-	PgSize 		int         (optional)
-	SrtDir 		string      (optional)
-	SrtKey 		string      (optional)
+	Groups 		    []Group
+	GroupClause     string
+	PgNum 		    int         (optional)
+	PgSize 		    int         (optional)
+	SrtDir 		    string      (optional)
+	SrtKey 		    string      (optional)
 }
 
 Group
-	Filters 	[]Filter
+	Filters 	    []Filter
+    FilterClause 	string
 }
 
 Filter
-	Operator 	string
-	Term 		string
-	Value 		string
+	Operator 	    string
+	Term 		    string
+	Value 		    string
 }
   ```
 Returns:
