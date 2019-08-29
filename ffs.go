@@ -58,6 +58,7 @@ type FileEvent struct {
 	SyncDestination				string			`json:"syncDestination,omitempty"`
 }
 
+//Currently recognized csv headers
 var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date Inserted (UTC)", "File path", "Filename", "File type", "File Category", "File size (bytes)", "File Owner", "MD5 Hash", "SHA-256 Hash", "Create Date", "Modified Date", "Username", "Device ID", "User UID", "Hostname", "Fully Qualified Domain Name", "IP address (public)", "IP address (private)", "Actor", "Directory ID", "Source", "URL", "Shared", "Shared With", "File exposure changed to", "Cloud drive ID", "Detection Source Alias", "File Id", "Exposure Type", "Process Owner", "Process Name", "Removable Media Vendor", "Removable Media Name", "Removable Media Serial Number", "Removable Media Capacity", "Removable Media Bus Type", "Sync Destination"}
 
 //Structs of Crashplan FFS API Authentication Token Return
@@ -88,8 +89,6 @@ type Filter struct {
 	Term 			string 		`json:"term"`
 	Value 			string 		`json:"value"`
 }
-
-//TODO Determine if I want to provide the API URLs or if they should be provided as constants here.
 
 /*
 GetAuthData - Function to get the Authentication data (mainly the authentication token) which will be needed for the rest of the API calls
@@ -313,6 +312,7 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 
 	var fileEvent FileEvent
 
+	//Build FileEvent struct
 	fileEvent = FileEvent{
 		EventId:                    eventId,
 		EventType:                  eventType,
@@ -359,15 +359,15 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 	return fileEvent
 }
 
-//TODO create Global Function for calling getFileEvents with JSON url formatting (this may be deprecated by Code42 soon)
+//TODO create Global Function for calling getFileEvents with JSON url formatting (this may be not be needed, Code42 seems to frown upon using this for pulling large amounts of events.)
 
 /*
 getFileEvents - Function to get the actual event records from FFS
- */
-
-//TODO Investigate Below
-/*
-How to handle the wide variety of query customizability (if it should be handled at all)
+authData - authData struct which contains the authentication API token
+ffsURI - the URI for where to pull the FFS events
+query - query struct which contains the actual FFS query and a golang valid form
+This function contains a panic if the csv columns do not match the currently specified list.
+This is to prevent data from being messed up during parsing.
  */
 func GetFileEvents(authData AuthData, ffsURI string, query Query) ([]FileEvent,error) {
 
@@ -442,7 +442,10 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) ([]FileEvent,e
 	return fileEvents,nil
 }
 
-
+/*
+Calculate the difference between two different slices
+Used in this case to tell if the csv columns have changed
+ */
 func difference(slice1 []string, slice2 []string) []string {
 	var diff []string
 

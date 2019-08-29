@@ -146,8 +146,8 @@ Limitations:
 
 Code42 Crashplan FFS API has limitations like most APIs, these limitations affect the GetFileEvents function:
 
-1. 120 Queries per minute, any additional queries will be dropped. (never actually bothered to test if this limit is actually enforced)
-2. 200,000 results returned per query. This limitation is kind of annoying to handle as there is no easy way to handle it. The API does not support paging and the only way to figure out how many results there is for a query is to first query, count, then if over 200,000 results, break up the query into smaller time increments and perform multiple queries  to get all of the results.
+1. 120 Queries per minute, any additional queries will be dropped. (never actually bothered to test if/how this limit is actually enforced)
+2. 200,000 results returned per query. This limitation is kind of annoying to handle as there is no easy way to handle it. The API does not support paging and the only way to figure out how many results there is for a query is to first query, count, then if over 200,000 results, break up the query into smaller time increments and perform multiple queries to get all of the results.
 
 ## Code42 Documentation
 
