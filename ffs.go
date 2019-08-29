@@ -63,7 +63,9 @@ var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date
 
 //Structs of Crashplan FFS API Authentication Token Return
 type AuthData struct {
-	Data AuthToken `json:"data"`
+	Data 		AuthToken 	`json:"data"`
+	Error       string 		`json:"error,omitempty"`
+	Warnings    string 		`json:"warnings,omitempty"`
 }
 type AuthToken struct {
 	V3UserToken string `json:"v3_user_token"`
@@ -126,14 +128,18 @@ func GetAuthData(uri string, username string, password string) (AuthData,error) 
 	//Create AuthData variable
 	var authData AuthData
 
-	responseBytes, _ := ioutil.ReadAll(resp.Body)
+	respData := resp.Body
+
+	responseBytes, _ := ioutil.ReadAll(respData)
+
+	log.Println(string(responseBytes))
 
 	if strings.Contains(string(responseBytes),"Service Under Maintenance") {
 		return AuthData{}, errors.New("error: auth api service is under maintenance")
 	}
 
 	//Decode the resp.Body into authData variable
-	err = json.NewDecoder(resp.Body).Decode(&authData)
+	err = json.Unmarshal(responseBytes, &authData)
 
 	//Return nil and err if decoding of resp.Body fails
 	if err != nil {
