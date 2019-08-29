@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -125,6 +126,12 @@ func GetAuthData(uri string, username string, password string) (AuthData,error) 
 
 	//Create AuthData variable
 	var authData AuthData
+
+	responseBytes, _ := ioutil.ReadAll(resp.Body)
+
+	if strings.Contains(string(responseBytes),"Service Under Maintenance") {
+		return AuthData{}, errors.New("error: auth api service is under maintenance")
+	}
 
 	//Decode the resp.Body into authData variable
 	err = json.NewDecoder(resp.Body).Decode(&authData)
