@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -431,19 +432,26 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) ([]FileEvent,e
 	var fileEvents []FileEvent
 
 	//Loop through CSV lines
-	for lineNumber, lineContent := range data {
-		if lineNumber != 0 {
-			//Convert CSV line to file events and add to slice
-			fileEvents = append(fileEvents, csvLineToFileEvent(lineContent))
-		} else {
-			//Validate that the columns have not changed
-			differences := difference(lineContent, csvHeaders)
+	var wg sync.WaitGroup
+	wg.Add(len(data))
+	go func() {
+		for lineNumber, lineContent := range data {
+			if lineNumber != 0 {
+				//Convert CSV line to file events and add to slice
+				fileEvents = append(fileEvents, csvLineToFileEvent(lineContent))
+			} else {
+				//Validate that the columns have not changed
+				differences := difference(lineContent, csvHeaders)
 
-			if len(differences) > 0 {
-				panic(errors.New("number of columns in CSV file does not match expected number, API changed, panicking to keep data integrity. columns that changed: " + strings.Join(differences,",")))
+				if len(differences) > 0 {
+					panic(errors.New("number of columns in CSV file does not match expected number, API changed, panicking to keep data integrity. columns that changed: " + strings.Join(differences,",")))
+				}
 			}
+			wg.Done()
 		}
-	}
+	}()
+
+	wg.Wait()
 
 	return fileEvents,nil
 }
