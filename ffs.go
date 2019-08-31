@@ -133,8 +133,6 @@ func GetAuthData(uri string, username string, password string) (AuthData,error) 
 
 	responseBytes, _ := ioutil.ReadAll(respData)
 
-	log.Println(string(responseBytes))
-
 	if strings.Contains(string(responseBytes),"Service Under Maintenance") {
 		return AuthData{}, errors.New("error: auth api service is under maintenance")
 	}
