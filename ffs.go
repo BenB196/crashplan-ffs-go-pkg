@@ -19,8 +19,8 @@ import (
 type FileEvent struct {
 	EventId						string			`json:"eventId"`
 	EventType					string			`json:"eventType"`
-	EventTimestamp				time.Time		`json:"eventTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
-	InsertionTimestamp			time.Time		`json:"insertionTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
+	EventTimestamp				time.Time		`json:"eventTimestamp,omitempty"`
+	InsertionTimestamp			time.Time		`json:"insertionTimestamp,omitempty"`
 	FilePath					string			`json:"filePath"`
 	FileName					string			`json:"fileName"`
 	FileType					string			`json:"fileType"`
@@ -29,8 +29,8 @@ type FileEvent struct {
 	FileOwner					string			`json:"fileOwner,omitempty"`
 	Md5Checksum					string			`json:"md5Checksum,omitempty"`
 	Sha256Checksum				string			`json:"sha256Checksum,omitempty"`
-	CreatedTimestamp			time.Time		`json:"createdTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
-	ModifyTimestamp				time.Time		`json:"modifyTimestamp,omitempty"` //This is really a time (might be better to convert to a time instead of a string)
+	CreatedTimestamp			time.Time		`json:"createdTimestamp,omitempty"`
+	ModifyTimestamp				time.Time		`json:"modifyTimestamp,omitempty"`
 	DeviceUserName				string			`json:"deviceUserName"`
 	DeviceUid					string			`json:"deviceUid"`
 	UserUid						string			`json:"userUid"`
