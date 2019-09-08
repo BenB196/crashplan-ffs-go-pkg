@@ -112,10 +112,10 @@ FileEvent
     Sha256Checksum              string	        (potentially empty)
     CreatedTimestamp            time.Time       (potentially empty)
     ModifyTimestamp             time.Time       (potentially empty)
-    DeviceUserName              string	
+    DeviceUsername              string	
     DeviceUid                   string	
     UserUid                     string	
-    OsHostName                  string	
+    OsHostname                  string	
     DomainName                  string	
     PublicIpAddress             string	        (potentially empty)
     PrivateIpAddresses          []string
