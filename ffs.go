@@ -26,7 +26,7 @@ type FileEvent struct {
 	FileType					string			`json:"fileType,omitempty"`
 	FileCategory				string			`json:"fileCategory,omitempty"`
 	FileSize					int				`json:"fileSize"`
-	FileOwner					string			`json:"fileOwner,omitempty"`
+	FileOwner					[]string		`json:"fileOwner,omitempty"`  //Array of owners
 	Md5Checksum					string			`json:"md5Checksum,omitempty"`
 	Sha256Checksum				string			`json:"sha256Checksum,omitempty"`
 	CreatedTimestamp			time.Time		`json:"createdTimestamp,omitempty"`
@@ -166,7 +166,7 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 	fileType := csvLine[6]
 	fileCategory := csvLine[7]
 	fileSizeString := csvLine[8] //Converted to int below
-	fileOwner := csvLine[9]
+	fileOwnerString := csvLine[9] //Converted to slice below
 	md5Checksum := csvLine[10]
 	sha256Checksum := csvLine[11]
 	createdTimestampString := csvLine[12] //Converted to time below
@@ -239,6 +239,12 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 			log.Println(csvLine)
 			panic(err)
 		}
+	}
+
+	//Convert fileOwnerString to string slice
+	var fileOwner []string
+	if fileOwnerString != "" {
+		fileOwner = strings.Fields(fileOwnerString)
 	}
 
 	//Convert createdTimestamp to time

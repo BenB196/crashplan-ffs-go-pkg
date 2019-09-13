@@ -107,7 +107,7 @@ FileEvent
     FileType                    string          (potentially empty)
     FileCategory                string          (potentially empty)
     FileSize                    int
-    FileOwner                   string          (potentially empty)
+    FileOwner                   []string        (potentially empty)
     Md5Checksum                 string	        (potentially empty)
     Sha256Checksum              string	        (potentially empty)
     CreatedTimestamp            time.Time       (potentially empty)
