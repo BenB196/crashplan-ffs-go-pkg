@@ -21,26 +21,26 @@ type FileEvent struct {
 	EventType					string			`json:"eventType"`
 	EventTimestamp				time.Time		`json:"eventTimestamp,omitempty"`
 	InsertionTimestamp			time.Time		`json:"insertionTimestamp,omitempty"`
-	FilePath					string			`json:"filePath"`
+	FilePath					string			`json:"filePath,omitempty"`
 	FileName					string			`json:"fileName"`
-	FileType					string			`json:"fileType"`
-	FileCategory				string			`json:"fileCategory"`
+	FileType					string			`json:"fileType,omitempty"`
+	FileCategory				string			`json:"fileCategory,omitempty"`
 	FileSize					int				`json:"fileSize"`
 	FileOwner					string			`json:"fileOwner,omitempty"`
 	Md5Checksum					string			`json:"md5Checksum,omitempty"`
 	Sha256Checksum				string			`json:"sha256Checksum,omitempty"`
 	CreatedTimestamp			time.Time		`json:"createdTimestamp,omitempty"`
 	ModifyTimestamp				time.Time		`json:"modifyTimestamp,omitempty"`
-	DeviceUsername				string			`json:"deviceUsername"`
-	DeviceUid					string			`json:"deviceUid"`
-	UserUid						string			`json:"userUid"`
-	OsHostname					string			`json:"osHostname"`
-	DomainName					string			`json:"domainName"`
+	DeviceUsername				string			`json:"deviceUsername,omitempty"`
+	DeviceUid					string			`json:"deviceUid,omitempty"`
+	UserUid						string			`json:"userUid,omitempty"`
+	OsHostname					string			`json:"osHostname,omitempty"`
+	DomainName					string			`json:"domainName,omitempty"`
 	PublicIpAddress				string			`json:"publicIpAddress,omitempty"`
-	PrivateIpAddresses			[]string		`json:"privateIpAddresses"` //Array of IP address strings
+	PrivateIpAddresses			[]string		`json:"privateIpAddresses,omitempty"` //Array of IP address strings
 	Actor						string			`json:"actor,omitempty"`
 	DirectoryId					[]string		`json:"directoryId,omitempty"` //An array of something, I am not sure
-	Source						string			`json:"source"`
+	Source						string			`json:"source,omitempty"`
 	Url							string			`json:"url,omitempty"`
 	Shared						string			`json:"shared,omitempty"`
 	SharedWith					[]string		`json:"sharedWith,omitempty"` //An array of strings (Mainly Email Addresses)
