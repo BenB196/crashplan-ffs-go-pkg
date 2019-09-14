@@ -366,6 +366,22 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 		RemovableMediaBusType:      removableMediaBusType,
 		SyncDestination:            syncDestination,
 	}
+	
+	if eventTimestampString == "" {
+		fileEvent.EventTimestamp = nil
+	}
+
+	if insertionTimestampString == "" {
+		fileEvent.InsertionTimestamp = nil
+	}
+
+	if createdTimestampString == "" {
+		fileEvent.CreatedTimestamp = nil
+	}
+
+	if modifyTimestampString == "" {
+		fileEvent.ModifyTimestamp = nil
+	}
 
 	return fileEvent
 }
