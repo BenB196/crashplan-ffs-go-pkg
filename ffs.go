@@ -56,9 +56,9 @@ type FileEvent struct {
 	RemovableMediaSerialNumber	string			`json:"removableMediaSerialNumber,omitempty"`
 	RemovableMediaCapacity		*int			`json:"removableMediaCapacity,omitempty"`
 	RemovableMediaBusType		string			`json:"removableMediaBusType,omitempty"`
-	RemovableMediaMediaName		string			`json:"removableMediaMediaName"`
-	RemovableMediaVolumeName	string			`json:"removableMediaVolumeName"`
-	RemovableMediaPartitionId	string			`json:"removableMediaPartitionId"`
+	RemovableMediaMediaName		string			`json:"removableMediaMediaName,omitempty"`
+	RemovableMediaVolumeName	string			`json:"removableMediaVolumeName,omitempty"`
+	RemovableMediaPartitionId	string			`json:"removableMediaPartitionId,omitempty"`
 	SyncDestination				string			`json:"syncDestination,omitempty"`
 }
 
