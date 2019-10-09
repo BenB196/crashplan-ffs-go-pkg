@@ -138,8 +138,8 @@ FileEvent
     RemovableMediaCapacity      int             (potentially empty)
     RemovableMediaBusType       string	        (potentially empty)
     RemovableMediaMediaName     string          (potentially empty)
-	RemovableMediaVolumeName    string          (potentially empty)
-	RemovableMediaPartitionId   string          (potentially empty)
+    RemovableMediaVolumeName    string          (potentially empty)
+    RemovableMediaPartitionId   string          (potentially empty)
     SyncDestination             string	        (potentially empty)
 ```
 
