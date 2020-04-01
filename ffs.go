@@ -234,9 +234,9 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 	var err error
 
 	//Convert eventTimeStamp to time
-	var eventTimeStamp *time.Time
+	var eventTimeStamp time.Time
 	if eventTimestampString != "" {
-		*eventTimeStamp, err = time.Parse(time.RFC3339Nano, eventTimestampString)
+		eventTimeStamp, err = time.Parse(time.RFC3339Nano, eventTimestampString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -244,14 +244,12 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 			log.Println(csvLine)
 			panic(err)
 		}
-	} else {
-		eventTimeStamp = nil
 	}
 
 	//Convert insertionTimestamp to time
-	var insertionTimestamp *time.Time
+	var insertionTimestamp time.Time
 	if insertionTimestampString != "" {
-		*insertionTimestamp, err = time.Parse(time.RFC3339Nano, insertionTimestampString)
+		insertionTimestamp, err = time.Parse(time.RFC3339Nano, insertionTimestampString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -259,14 +257,12 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 			log.Println(csvLine)
 			panic(err)
 		}
-	} else {
-		insertionTimestamp = nil
 	}
 
 	//Convert fileSizeString to int
-	var fileSize *int
+	var fileSize int
 	if fileSizeString != "" {
-		*fileSize, err = strconv.Atoi(fileSizeString)
+		fileSize, err = strconv.Atoi(fileSizeString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -274,8 +270,6 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 			log.Println(csvLine)
 			panic(err)
 		}
-	} else {
-		fileSize = nil
 	}
 
 	//Convert fileOwnerString to string slice
@@ -285,9 +279,9 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 	}
 
 	//Convert createdTimestamp to time
-	var createdTimestamp *time.Time
+	var createdTimestamp time.Time
 	if createdTimestampString != "" {
-		*createdTimestamp, err = time.Parse("2006-01-02 15:04:05", createdTimestampString)
+		createdTimestamp, err = time.Parse("2006-01-02 15:04:05", createdTimestampString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -295,14 +289,12 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 			log.Println(csvLine)
 			panic(err)
 		}
-	} else {
-		createdTimestamp = nil
 	}
 
 	//Convert modifyTimestamp to time
-	var modifyTimestamp *time.Time
+	var modifyTimestamp time.Time
 	if modifyTimestampString != "" {
-		*modifyTimestamp, err = time.Parse("2006-01-02 15:04:05", modifyTimestampString)
+		modifyTimestamp, err = time.Parse("2006-01-02 15:04:05", modifyTimestampString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -310,56 +302,61 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 			log.Println(csvLine)
 			panic(err)
 		}
-	} else {
-		modifyTimestamp = nil
 	}
 
 	//Convert privateIpAddresses to string slice
 	var privateIpAddresses []string
 	if privateIpAddressesString != "" {
+		privateIpAddressesString := strings.Replace(privateIpAddressesString, "\n", "", -1)
 		privateIpAddresses = strings.Split(privateIpAddressesString, ",")
 	}
 
 	//Convert directoryId to string slice
 	var directoryId []string
 	if directoryIdString != "" {
+		directoryIdString := strings.Replace(directoryIdString, "\n", "", -1)
 		directoryId = strings.Split(directoryIdString, ",")
 	}
 
 	//Convert sharedWith to string slice
 	var sharedWith []string
 	if sharedWithString != "" {
+		sharedWithString := strings.Replace(sharedWithString, "\n", "", -1)
 		sharedWith = strings.Split(sharedWithString, ",")
 	}
 
 	//Convert sharingTypeAdded to string slice
 	var sharingTypeAdded []string
 	if sharingTypeAddedString != "" {
+		sharingTypeAddedString := strings.Replace(sharingTypeAddedString, "\n", "", -1)
 		sharingTypeAdded = strings.Split(sharingTypeAddedString, ",")
 	}
 
 	//Convert exposure to string slice
 	var exposure []string
 	if exposureString != "" {
+		exposureString := strings.Replace(exposureString, "\n", "", -1)
 		exposure = strings.Split(exposureString, ",")
 	}
 
 	//Convert emailDLPRecipients to string slice
 	var emailDLPRecipients []string
 	if emailDLPRecipientsString != "" {
+		emailDLPRecipientsString := strings.Replace(emailDLPRecipientsString, "\n", "", -1)
 		emailDLPRecipients = strings.Split(emailDLPRecipientsString, ",")
 	}
 
 	//Convert emailDLPPolicyNames to string slice
 	var emailDLPPolicyNames []string
 	if emailDLPPolicyNamesString != "" {
+		emailDLPPolicyNamesString := strings.Replace(emailDLPPolicyNamesString, "\n", "", -1)
 		emailDLPPolicyNames = strings.Split(emailDLPPolicyNamesString, ",")
 	}
 
 	//Convert removableMediaCapacity to int
-	var removableMediaCapacity *int
+	var removableMediaCapacity int
 	if removableMediaCapacityString != "" {
-		*removableMediaCapacity, err = strconv.Atoi(removableMediaCapacityString)
+		removableMediaCapacity, err = strconv.Atoi(removableMediaCapacityString)
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -367,8 +364,6 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 			log.Println(csvLine)
 			panic(err)
 		}
-	} else {
-		removableMediaCapacity = nil
 	}
 
 	var outsideActiveHours bool
@@ -401,20 +396,20 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 	fileEvent = FileEvent{
 		EventId:                     eventId,
 		EventType:                   eventType,
-		EventTimestamp:              eventTimeStamp,
-		InsertionTimestamp:          insertionTimestamp,
+		EventTimestamp:              &eventTimeStamp,
+		InsertionTimestamp:          &insertionTimestamp,
 		FilePath:                    filePath,
 		FileName:                    fileName,
 		FileType:                    fileType,
 		FileCategory:                fileCategory,
 		IdentifiedExtensionCategory: identifiedExtensionCategory,
 		CurrentExtensionCategory:    currentExtensionCategory,
-		FileSize:                    fileSize,
+		FileSize:                    &fileSize,
 		FileOwner:                   fileOwner,
 		Md5Checksum:                 md5Checksum,
 		Sha256Checksum:              sha256Checksum,
-		CreatedTimestamp:            createdTimestamp,
-		ModifyTimestamp:             modifyTimestamp,
+		CreatedTimestamp:            &createdTimestamp,
+		ModifyTimestamp:             &modifyTimestamp,
 		DeviceUsername:              deviceUserName,
 		DeviceUid:                   deviceUid,
 		UserUid:                     userUid,
@@ -440,7 +435,7 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 		RemovableMediaVendor:        removableMediaVendor,
 		RemovableMediaName:          removableMediaName,
 		RemovableMediaSerialNumber:  removableMediaSerialNumber,
-		RemovableMediaCapacity:      removableMediaCapacity,
+		RemovableMediaCapacity:      &removableMediaCapacity,
 		RemovableMediaBusType:       removableMediaBusType,
 		RemovableMediaMediaName:     removableMediaMediaName,
 		RemovableMediaVolumeName:    removableMediaVolumeName,
@@ -455,6 +450,36 @@ func csvLineToFileEvent(csvLine []string) FileEvent {
 		IdentifiedExtensionMIMEType: identifiedExtensionMimeType,
 		CurrentExtensionMIMEType:    currentExtensionMimeType,
 		SuspiciousFileTypeMismatch:  &suspiciousFileTypeMismatch,
+	}
+
+	//set eventTimestamp to nil if empty string
+	if eventTimestampString == "" {
+		fileEvent.EventTimestamp = nil
+	}
+
+	//set insertionTimestamp to nil if empty
+	if insertionTimestampString == "" {
+		fileEvent.InsertionTimestamp = nil
+	}
+
+	//set createdTimestamp to nil if empty
+	if createdTimestampString == "" {
+		fileEvent.CreatedTimestamp = nil
+	}
+
+	//set modifyTimestamp to nil if empty
+	if modifyTimestampString == "" {
+		fileEvent.ModifyTimestamp = nil
+	}
+
+	//set fileSize to nil if empty
+	if fileSizeString == "" {
+		fileEvent.FileSize = nil
+	}
+
+	//set removableMediaCapacity to nil if empty
+	if removableMediaCapacityString == "" {
+		fileEvent.RemovableMediaCapacity = nil
 	}
 
 	return fileEvent
