@@ -17,17 +17,17 @@ import (
 
 //The main body of a file event record
 type FileEvent struct {
-	EventId                     string     `json:"eventId"`
-	EventType                   string     `json:"eventType"`
+	EventId                     string     `json:"eventId,omitempty"`
+	EventType                   string     `json:"eventType,omitempty"`
 	EventTimestamp              *time.Time `json:"eventTimestamp,omitempty"`
 	InsertionTimestamp          *time.Time `json:"insertionTimestamp,omitempty"`
 	FilePath                    string     `json:"filePath,omitempty"`
-	FileName                    string     `json:"fileName"`
+	FileName                    string     `json:"fileName,omitempty"`
 	FileType                    string     `json:"fileType,omitempty"`
 	FileCategory                string     `json:"fileCategory,omitempty"`
 	IdentifiedExtensionCategory string     `json:"identifiedExtensionCategory,omitempty"`
 	CurrentExtensionCategory    string     `json:"currentExtensionCategory,omitempty"`
-	FileSize                    *int       `json:"fileSize"`
+	FileSize                    *int       `json:"fileSize,omitempty"`
 	FileOwner                   []string   `json:"fileOwner,omitempty"` //Array of owners
 	Md5Checksum                 string     `json:"md5Checksum,omitempty"`
 	Sha256Checksum              string     `json:"sha256Checksum,omitempty"`
