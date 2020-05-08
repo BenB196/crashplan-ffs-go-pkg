@@ -98,8 +98,8 @@ Returns:
 ```
 #FileEvent struct structure
 FileEvent
-    EventId                     string	
-    EventType                   string	
+    EventId                     string
+    EventType                   string
     EventTimestamp              *time.Time      (potentially empty)
     InsertionTimestamp          *time.Time      (potentially empty)
     FilePath                    string          (potentially empty)
@@ -108,7 +108,7 @@ FileEvent
     FileCategory                string          (potentially empty)
     IdentifiedExtensionCategory string          (potentially empty)
     CurrentExtensionCategory    string          (potentially empty)
-    FileSize                    *int
+    FileSize                    *int            (potentially empty)
     FileOwner                   []string        (potentially empty)
     Md5Checksum                 string	        (potentially empty)
     Sha256Checksum              string	        (potentially empty)
@@ -139,7 +139,7 @@ FileEvent
     RemovableMediaVendor        string	        (potentially empty)
     RemovableMediaName          string	        (potentially empty)
     RemovableMediaSerialNumber  string	        (potentially empty)
-    RemovableMediaCapacity      *int             (potentially empty)
+    RemovableMediaCapacity      *int            (potentially empty)
     RemovableMediaBusType       string	        (potentially empty)
     RemovableMediaMediaName     string          (potentially empty)
     RemovableMediaVolumeName    string          (potentially empty)
@@ -157,6 +157,8 @@ FileEvent
     PrintJobName                string          (potentially empty)
     PrinterName                 string          (potentially empty)
     PrintedFilesBackupPath      string          (potentially empty)
+    RemoteActivity              string          (potentially empty)
+    Trusted                     *bool           (potentially empty)
 ```
 
 - error - Any errors.
@@ -166,7 +168,7 @@ Limitations:
 Code42 Crashplan FFS API has limitations like most APIs, these limitations affect the GetFileEvents function:
 
 1. 120 Queries per minute, any additional queries will be dropped. (never actually bothered to test if/how this limit is actually enforced)
-2. 200,000 results returned per query. This limitation is kind of annoying to handle as there is no easy way to handle it. The API does not support paging and the only way to figure out how many results there is for a query is to first query, count, then if over 200,000 results, break up the query into smaller time increments and perform multiple queries to get all of the results.
+2. 200,000 results returned per query. This limitation is kind of annoying to handle as there is no easy way to handle it. The API does not support paging and the only way to figure out how many results there is for a query is to first query, count, then if over 200,000 results, break up the query into smaller time increments and perform multiple queries to get all the results.
 3. The GetFileEvents function only supports the /v1/fileevent/export API endpoint currently. This has to do with how the highly limited functionality of the /v1/fileevent endpoint which isn't well documented.
 
 ## Code42 Documentation

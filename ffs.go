@@ -76,10 +76,12 @@ type FileEvent struct {
 	PrintJobName                string     `json:"printJobName,omitempty"`
 	PrinterName                 string     `json:"printerName,omitempty"`
 	PrintedFilesBackupPath      string     `json:"printedFilesBackupPath,omitempty"`
+	RemoteActivity              string     `json:"remoteActivity,omitempty"`
+	Trusted                     *bool      `json:"trusted,omitempty"`
 }
 
 //Currently recognized csv headers
-var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date Inserted (UTC)", "File path", "Filename", "File type", "File Category", "Identified Extension Category", "Current Extension Category", "File size (bytes)", "File Owner", "MD5 Hash", "SHA-256 Hash", "Create Date", "Modified Date", "Username", "Device ID", "User UID", "Hostname", "Fully Qualified Domain Name", "IP address (public)", "IP address (private)", "Actor", "Directory ID", "Source", "URL", "Shared", "Shared With", "File exposure changed to", "Cloud drive ID", "Detection Source Alias", "File Id", "Exposure Type", "Process Owner", "Process Name", "Tab/Window Title", "Tab URL", "Removable Media Vendor", "Removable Media Name", "Removable Media Serial Number", "Removable Media Capacity", "Removable Media Bus Type", "Removable Media Media Name", "Removable Media Volume Name", "Removable Media Partition Id", "Sync Destination", "Email DLP Policy Names", "Email DLP Subject", "Email DLP Sender", "Email DLP From", "Email DLP Recipients", "Outside Active Hours", "Identified Extension MIME Type", "Current Extension MIME Type", "Suspicious File Type Mismatch", "Print Job Name", "Printer Name", "Printed Files Backup Path"}
+var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date Inserted (UTC)", "File path", "Filename", "File type", "File Category", "Identified Extension Category", "Current Extension Category", "File size (bytes)", "File Owner", "MD5 Hash", "SHA-256 Hash", "Create Date", "Modified Date", "Username", "Device ID", "User UID", "Hostname", "Fully Qualified Domain Name", "IP address (public)", "IP address (private)", "Actor", "Directory ID", "Source", "URL", "Shared", "Shared With", "File exposure changed to", "Cloud drive ID", "Detection Source Alias", "File Id", "Exposure Type", "Process Owner", "Process Name", "Tab/Window Title", "Tab URL", "Removable Media Vendor", "Removable Media Name", "Removable Media Serial Number", "Removable Media Capacity", "Removable Media Bus Type", "Removable Media Media Name", "Removable Media Volume Name", "Removable Media Partition Id", "Sync Destination", "Email DLP Policy Names", "Email DLP Subject", "Email DLP Sender", "Email DLP From", "Email DLP Recipients", "Outside Active Hours", "Identified Extension MIME Type", "Current Extension MIME Type", "Suspicious File Type Mismatch", "Print Job Name", "Printer Name", "Printed Files Backup Path", "Remote Activity", "Trusted"}
 
 //Structs of Crashplan FFS API Authentication Token Return
 type AuthData struct {
@@ -527,6 +529,26 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 
 	//set printedFilesBackupPath
 	fileEvent.PrintedFilesBackupPath = csvLine[58]
+
+	//set remoteActivity
+	fileEvent.RemoteActivity = csvLine[59]
+
+	//set trusted
+	if csvLine[60] != "" {
+		var trusted bool
+		trusted, err = strconv.ParseBool(csvLine[60])
+
+		//Panic if this fails, that means something is wrong with CSV handling
+		if err != nil {
+			log.Println("Error parsing trustedString, something must be wrong with CSV parsing.")
+			log.Println(csvLine)
+			panic(err)
+		}
+
+		fileEvent.Trusted = &trusted
+	} else {
+		fileEvent.Trusted = nil
+	}
 
 	return &fileEvent
 }
