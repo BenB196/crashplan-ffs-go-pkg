@@ -159,6 +159,7 @@ FileEvent
     PrintedFilesBackupPath      string          (potentially empty)
     RemoteActivity              string          (potentially empty)
     Trusted                     *bool           (potentially empty)
+    LoggedInOperatingSystemUser string          (potentially empty)
 ```
 
 - error - Any errors.
