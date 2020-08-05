@@ -145,6 +145,7 @@ FileEvent
     RemovableMediaVolumeName    string          (potentially empty)
     RemovableMediaPartitionId   string          (potentially empty)
     SyncDestination             string	        (potentially empty)
+    SyncDestinationUsername     string          (potentially empty)
     EmailDLPPolicyNames         []string        (potentially empty)
     EmailDLPSubject             string          (potentially empty)
     EmailDLPSender              string          (potentially empty)
