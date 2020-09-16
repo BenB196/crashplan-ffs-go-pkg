@@ -459,7 +459,7 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	fileEvent.SyncDestination = csvLine[46]
 
 	//set syncDestinationUsername
-	fileEvent.SyncDestination = csvLine[47]
+	fileEvent.SyncDestinationUsername = csvLine[47]
 
 	//set emailDLPPolicyNames
 	//Convert emailDLPPolicyNames to string slice
