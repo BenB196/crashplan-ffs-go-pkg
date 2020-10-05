@@ -326,7 +326,10 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	fileEvent.DomainName = csvLine[20]
 
 	//set publicIpAddress
-	fileEvent.PublicIpAddress = csvLine[21]
+	if csvLine[21] != "" {
+		fileEvent.PublicIpAddress = strings.Replace(strings.Replace(csvLine[21], "/", "", -1), ":0", "", -1)
+	}
+
 
 	//set privateIpAddresses
 	//Convert privateIpAddresses to string slice
