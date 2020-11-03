@@ -4,6 +4,7 @@ package ffs
 import (
 	"bytes"
 	"encoding/csv"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -681,10 +682,27 @@ func equal(slice1 []string, slice2 []string) error {
 
 			//we don't need to worry about slice2, its static
 			if v != slice2[i] {
+				println("error with last element in csv headers")
+				println("slice1[i] bytes:")
+				println([]byte(v))
+				println("slice1[i] hex:")
+				println(hex.EncodeToString([]byte(v)))
+				println("slice2[i] bytes:")
+				println([]byte(slice2[i]))
+				println("slice2[i] hex:")
+				println(hex.EncodeToString([]byte(slice2[i])))
 				return errors.New("column order/naming does not match; slice1: i = " + strconv.Itoa(i) + ", v = " + v + "; slice2 v = " + slice2[i])
 			}
 		} else {
 			if v != slice2[i] {
+				println("slice1[i] bytes:")
+				println([]byte(v))
+				println("slice1[i] hex:")
+				println(hex.EncodeToString([]byte(v)))
+				println("slice2[i] bytes:")
+				println([]byte(slice2[i]))
+				println("slice2[i] hex:")
+				println(hex.EncodeToString([]byte(slice2[i])))
 				return errors.New("column order/naming does not match; slice1: i = " + strconv.Itoa(i) + ", v = " + v + "; slice2 v = " + slice2[i])
 			}
 		}
