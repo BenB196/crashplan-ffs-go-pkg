@@ -646,9 +646,10 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent,
 				fileEvents = append(fileEvents, *csvLineToFileEvent(lineContent))
 			} else {
 				//Validate that the columns have not changed
-				equal := equal(lineContent, csvHeaders)
+				err = equal(lineContent, csvHeaders)
 
-				if !equal {
+				if err != nil {
+					println(err)
 					panic(errors.New("number of columns in CSV file does not match expected number, API changed, panicking to keep data integrity. New CSV columns: " + strings.Join(lineContent, ",")))
 				}
 			}
@@ -665,16 +666,29 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent,
 Calculate the difference between two different slices
 Used in this case to tell if the csv columns have changed
 */
-func equal(slice1 []string, slice2 []string) bool {
+func equal(slice1 []string, slice2 []string) error {
 	if len(slice1) != len(slice2) {
-		return false
+		return errors.New("slices and CSV header sizes do not match")
 	}
 
+	//loop through slices to check values
 	for i, v := range slice1 {
-		if v != slice2[i] {
-			return false
+		//if last element in slice1, remove potential eol char
+		if i == len(slice1) - 1 {
+			v = strings.Replace(v, "\r\n", "", -1)
+			v = strings.Replace(v, "\r", "", -1)
+			v = strings.Replace(v, "\n", "", -1)
+
+			//we don't need to worry about slice2, its static
+			if v != slice2[i] {
+				return errors.New("column order/naming does not match")
+			}
+		} else {
+			if v != slice2[i] {
+				return errors.New("column order/naming does not match")
+			}
 		}
 	}
 
-	return true
+	return nil
 }
