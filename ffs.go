@@ -649,7 +649,7 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent,
 				err = equal(lineContent, csvHeaders)
 
 				if err != nil {
-					println(err)
+					println(err.Error())
 					panic(errors.New("number of columns in CSV file does not match expected number, API changed, panicking to keep data integrity. New CSV columns: " + strings.Join(lineContent, ",")))
 				}
 			}
@@ -668,7 +668,7 @@ Used in this case to tell if the csv columns have changed
 */
 func equal(slice1 []string, slice2 []string) error {
 	if len(slice1) != len(slice2) {
-		return errors.New("slices and CSV header sizes do not match")
+		return errors.New("slices and CSV header sizes do not match, expected: " + strconv.Itoa(len(slice2)) + ", but got: " + strconv.Itoa(len(slice1)))
 	}
 
 	//loop through slices to check values
@@ -681,11 +681,11 @@ func equal(slice1 []string, slice2 []string) error {
 
 			//we don't need to worry about slice2, its static
 			if v != slice2[i] {
-				return errors.New("column order/naming does not match")
+				return errors.New("column order/naming does not match; slice1: i = " + strconv.Itoa(i) + ", v = " + v + "; slice2 v = " + slice2[i])
 			}
 		} else {
 			if v != slice2[i] {
-				return errors.New("column order/naming does not match")
+				return errors.New("column order/naming does not match; slice1: i = " + strconv.Itoa(i) + ", v = " + v + "; slice2 v = " + slice2[i])
 			}
 		}
 	}
