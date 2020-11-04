@@ -14,7 +14,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"golang.org/x/text/encoding/charmap"
+	"unicode/utf8"
 )
 
 //The main body of a file event record
@@ -625,8 +625,7 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent,
 	}
 
 	//Read Response Body as CSV
-	//reader := csv.NewReader(resp.Body)
-	reader := csv.NewReader(charmap.ISO8859_15.NewDecoder().Reader(resp.Body))
+	reader := csv.NewReader(resp.Body)
 	reader.Comma = ','
 
 	//Read body into variable
@@ -676,8 +675,14 @@ func equal(slice1 []string, slice2 []string) error {
 
 	//loop through slices to check values
 	for i, v := range slice1 {
-		//if last element in slice1, remove potential eol char
+		//Remove first char in first string (this is utf-8-sig, need to handle boom)
+		if i == 0 {
+			_, x := utf8.DecodeRuneInString(v)
+			slice1[i] = v[x:]
+		}
+
 		if i == len(slice1) - 1 {
+			//if last element in slice1, remove potential eol char
 			v = strings.Replace(v, "\r\n", "", -1)
 			v = strings.Replace(v, "\r", "", -1)
 			v = strings.Replace(v, "\n", "", -1)
