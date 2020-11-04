@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"golang.org/x/text/encoding/charmap"
 )
 
 //The main body of a file event record
@@ -624,7 +625,8 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent,
 	}
 
 	//Read Response Body as CSV
-	reader := csv.NewReader(resp.Body)
+	//reader := csv.NewReader(resp.Body)
+	reader := csv.NewReader(charmap.ISO8859_15.NewDecoder().Reader(resp.Body))
 	reader.Comma = ','
 
 	//Read body into variable
