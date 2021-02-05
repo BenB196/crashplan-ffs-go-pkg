@@ -57,6 +57,8 @@ type FileEvent struct {
 	ProcessName                 string     `json:"processName,omitempty"`
 	TabWindowTitle              string     `json:"tabWindowTitle,omitempty"`
 	TabUrl                      string     `json:"tabUrl,omitempty"`
+	TabTitles                   []string   `json:"tabTitles,omitempty"`
+	TabURLs                     []string   `json:"tabURLs,omitempty"`
 	RemovableMediaVendor        string     `json:"removableMediaVendor,omitempty"`
 	RemovableMediaName          string     `json:"removableMediaName,omitempty"`
 	RemovableMediaSerialNumber  string     `json:"removableMediaSerialNumber,omitempty"`
@@ -87,7 +89,7 @@ type FileEvent struct {
 }
 
 //Currently recognized csv headers
-var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date Inserted (UTC)", "File path", "Filename", "File type", "File Category", "Identified Extension Category", "Current Extension Category", "File size (bytes)", "File Owner", "MD5 Hash", "SHA-256 Hash", "Create Date", "Modified Date", "Username", "Device ID", "User UID", "Hostname", "Fully Qualified Domain Name", "IP address (public)", "IP address (private)", "Actor", "Directory ID", "Source", "URL", "Shared", "Shared With Users", "File exposure changed to", "Cloud drive ID", "Detection Source Alias", "File Id", "Exposure Type", "Process Owner", "Process Name", "Tab/Window Title", "Tab URL", "Removable Media Vendor", "Removable Media Name", "Removable Media Serial Number", "Removable Media Capacity", "Removable Media Bus Type", "Removable Media Media Name", "Removable Media Volume Name", "Removable Media Partition Id", "Sync Destination", "Sync Destination Username", "Email DLP Policy Names", "Email DLP Subject", "Email DLP Sender", "Email DLP From", "Email DLP Recipients", "Outside Active Hours", "Identified Extension MIME Type", "Current Extension MIME Type", "Suspicious File Type Mismatch", "Print Job Name", "Printer Name", "Printed Files Backup Path", "Remote Activity", "Trusted", "Logged in Operating System User", "Destination Category", "Destination Name"}
+var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date Inserted (UTC)", "File path", "Filename", "File type", "File Category", "Identified Extension Category", "Current Extension Category", "File size (bytes)", "File Owner", "MD5 Hash", "SHA-256 Hash", "Create Date", "Modified Date", "Username", "Device ID", "User UID", "Hostname", "Fully Qualified Domain Name", "IP address (public)", "IP address (private)", "Actor", "Directory ID", "Source", "URL", "Shared", "Shared With Users", "File exposure changed to", "Cloud drive ID", "Detection Source Alias", "File Id", "Exposure Type", "Process Owner", "Process Name", "Tab/Window Title", "Tab URL", "Table Titles", "Tab URLs", "Removable Media Vendor", "Removable Media Name", "Removable Media Serial Number", "Removable Media Capacity", "Removable Media Bus Type", "Removable Media Media Name", "Removable Media Volume Name", "Removable Media Partition Id", "Sync Destination", "Sync Destination Username", "Email DLP Policy Names", "Email DLP Subject", "Email DLP Sender", "Email DLP From", "Email DLP Recipients", "Outside Active Hours", "Identified Extension MIME Type", "Current Extension MIME Type", "Suspicious File Type Mismatch", "Print Job Name", "Printer Name", "Printed Files Backup Path", "Remote Activity", "Trusted", "Logged in Operating System User", "Destination Category", "Destination Name"}
 
 //Structs of Crashplan FFS API Authentication Token Return
 type AuthData struct {
@@ -422,20 +424,36 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	//set tabUrl
 	fileEvent.TabUrl = csvLine[37]
 
+	//set tabTitles
+	//Convert tabTitles to string slice
+	if csvLine[38] != "" {
+		fileEvent.Exposure = strings.Split(csvLine[38], ",")
+	} else {
+		fileEvent.Exposure = nil
+	}
+
+	//set tabURLs
+	//Convert tabURLs to string slice
+	if csvLine[39] != "" {
+		fileEvent.Exposure = strings.Split(csvLine[39], ",")
+	} else {
+		fileEvent.Exposure = nil
+	}
+
 	//set removableMediaVendor
-	fileEvent.RemovableMediaVendor = csvLine[38]
+	fileEvent.RemovableMediaVendor = csvLine[40]
 
 	//set removableMediaName
-	fileEvent.RemovableMediaName = csvLine[39]
+	fileEvent.RemovableMediaName = csvLine[41]
 
 	//set removableMediaSerialNumber
-	fileEvent.RemovableMediaSerialNumber = csvLine[40]
+	fileEvent.RemovableMediaSerialNumber = csvLine[42]
 
 	//set removableMediaCapacity
 	//Convert removableMediaCapacity to int
-	if csvLine[41] != "" {
+	if csvLine[43] != "" {
 		var removableMediaCapacity int
-		removableMediaCapacity, err = strconv.Atoi(csvLine[41])
+		removableMediaCapacity, err = strconv.Atoi(csvLine[43])
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -450,52 +468,52 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	}
 
 	//set removableMediaBusType
-	fileEvent.RemovableMediaBusType = csvLine[42]
+	fileEvent.RemovableMediaBusType = csvLine[44]
 
 	//set removableMediaMediaName
-	fileEvent.RemovableMediaMediaName = csvLine[43]
+	fileEvent.RemovableMediaMediaName = csvLine[45]
 
 	//set removableMediaVolumeName
-	fileEvent.RemovableMediaVolumeName = csvLine[44]
+	fileEvent.RemovableMediaVolumeName = csvLine[46]
 
 	//set removableMediaPartitionId
-	fileEvent.RemovableMediaPartitionId = csvLine[45]
+	fileEvent.RemovableMediaPartitionId = csvLine[47]
 
 	//set syncDestination
-	fileEvent.SyncDestination = csvLine[46]
+	fileEvent.SyncDestination = csvLine[48]
 
 	//set syncDestinationUsername
-	fileEvent.SyncDestinationUsername = csvLine[47]
+	fileEvent.SyncDestinationUsername = csvLine[49]
 
 	//set emailDLPPolicyNames
 	//Convert emailDLPPolicyNames to string slice
-	if csvLine[48] != "" {
-		fileEvent.EmailDLPPolicyNames = strings.Split(csvLine[48], ",")
+	if csvLine[50] != "" {
+		fileEvent.EmailDLPPolicyNames = strings.Split(csvLine[50], ",")
 	} else {
 		fileEvent.EmailDLPPolicyNames = nil
 	}
 
 	//set emailDLPSubject
-	fileEvent.EmailDLPSubject = csvLine[49]
+	fileEvent.EmailDLPSubject = csvLine[51]
 
 	//set emailDLPSender
-	fileEvent.EmailDLPSender = csvLine[50]
+	fileEvent.EmailDLPSender = csvLine[52]
 
 	//set emailDLPFrom
-	fileEvent.EmailDLPFrom = csvLine[51]
+	fileEvent.EmailDLPFrom = csvLine[53]
 
 	//set emailDLPRecipients
 	//Convert emailDLPRecipients to string slice
-	if csvLine[52] != "" {
-		fileEvent.EmailDLPRecipients = strings.Split(csvLine[52], ",")
+	if csvLine[54] != "" {
+		fileEvent.EmailDLPRecipients = strings.Split(csvLine[54], ",")
 	} else {
 		fileEvent.EmailDLPRecipients = nil
 	}
 
 	//set outsideActiveHours
-	if csvLine[53] != "" {
+	if csvLine[55] != "" {
 		var outsideActiveHours bool
-		outsideActiveHours, err = strconv.ParseBool(csvLine[53])
+		outsideActiveHours, err = strconv.ParseBool(csvLine[55])
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -510,15 +528,15 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	}
 
 	//set identifiedExtensionMimeType
-	fileEvent.IdentifiedExtensionMIMEType = csvLine[54]
+	fileEvent.IdentifiedExtensionMIMEType = csvLine[56]
 
 	//set currentExtensionMimeType
-	fileEvent.CurrentExtensionMIMEType = csvLine[55]
+	fileEvent.CurrentExtensionMIMEType = csvLine[57]
 
 	//set suspiciousFileTypeMismatch
-	if csvLine[56] != "" {
+	if csvLine[58] != "" {
 		var suspiciousFileTypeMismatch bool
-		suspiciousFileTypeMismatch, err = strconv.ParseBool(csvLine[56])
+		suspiciousFileTypeMismatch, err = strconv.ParseBool(csvLine[58])
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -533,21 +551,21 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	}
 
 	//set printJobName
-	fileEvent.PrintJobName = csvLine[57]
+	fileEvent.PrintJobName = csvLine[59]
 
 	//set printerName
-	fileEvent.PrinterName = csvLine[58]
+	fileEvent.PrinterName = csvLine[60]
 
 	//set printedFilesBackupPath
-	fileEvent.PrintedFilesBackupPath = csvLine[59]
+	fileEvent.PrintedFilesBackupPath = csvLine[61]
 
 	//set remoteActivity
-	fileEvent.RemoteActivity = csvLine[60]
+	fileEvent.RemoteActivity = csvLine[62]
 
 	//set trusted
-	if csvLine[61] != "" {
+	if csvLine[63] != "" {
 		var trusted bool
-		trusted, err = strconv.ParseBool(csvLine[61])
+		trusted, err = strconv.ParseBool(csvLine[63])
 
 		//Panic if this fails, that means something is wrong with CSV handling
 		if err != nil {
@@ -562,13 +580,13 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	}
 
 	//set loggedInOperatingSystemUser
-	fileEvent.LoggedInOperatingSystemUser = csvLine[62]
+	fileEvent.LoggedInOperatingSystemUser = csvLine[64]
 
 	//set destinationCategory
-	fileEvent.DestinationCategory = csvLine[63]
+	fileEvent.DestinationCategory = csvLine[65]
 
 	//set destinationName
-	fileEvent.DestinationName = csvLine[64]
+	fileEvent.DestinationName = csvLine[66]
 
 	return &fileEvent
 }
