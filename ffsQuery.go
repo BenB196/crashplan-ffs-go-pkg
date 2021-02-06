@@ -6,7 +6,7 @@ type Query struct {
 	GroupClause string  `json:"groupClause,omitempty"`
 	PgNum       int     `json:"pgNum,omitempty"`
 	PgSize      int     `json:"pgSize,omitempty"`
-	PgToken     *string `json:"pgToken,omitempty"`
+	PgToken     string `json:"pgToken"`
 	SrtDir      string  `json:"srtDir,omitempty"`
 	SrtKey      string  `json:"srtKey,omitempty"`
 }
