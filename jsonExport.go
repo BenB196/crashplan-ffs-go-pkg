@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -64,11 +65,11 @@ type JsonFileEvent struct {
 	RemovableMediaVolumeName   []string     `json:"removableMediaVolumeName,omitempty"`
 	Sha256Checksum             string       `json:"sha256Checksum,omitempty"`
 	Shared                     string       `json:"shared,omitempty"`
-	SharedWith                 []SharedWith  `json:"sharedWith,omitempty"`
+	SharedWith                 []SharedWith `json:"sharedWith,omitempty"`
 	SharingTypeAdded           []string     `json:"sharingTypeAdded,omitempty"`
 	Source                     string       `json:"source,omitempty"`
 	SyncDestination            string       `json:"syncDestination,omitempty"`
-	SyncDestinationUsername    []string       `json:"syncDestinationUsername,omitempty"`
+	SyncDestinationUsername    []string     `json:"syncDestinationUsername,omitempty"`
 	TabUrl                     string       `json:"tabUrl,omitempty"`
 	Tabs                       []Tab        `json:"tabs,omitempty"`
 	Trusted                    *bool        `json:"trusted,omitempty"`
@@ -93,7 +94,7 @@ type Tab struct {
 
 type JsonFileEventResponse struct {
 	FileEvents  []JsonFileEvent `json:"fileEvents,omitempty"`
-	NextPgToken *string         `json:"nextPgToken,omitempty"`
+	NextPgToken string          `json:"nextPgToken,omitempty"`
 	Problems    []QueryProblem  `json:"problems,omitempty"`
 	TotalCount  *int64          `json:"totalCount,omitempty"`
 }
@@ -117,22 +118,22 @@ func GetJsonFileEventResponse(resp *http.Response) (*JsonFileEventResponse, erro
 	return &eventResponse, nil
 }
 
-func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken *string) (*[]JsonFileEvent, *string, error) {
+func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken string) (*[]JsonFileEvent, string, error) {
 	var jsonFileEvents []JsonFileEvent
 
-	if pgToken != nil && *pgToken != "" {
+	if pgToken != "" {
 		query.PgToken = pgToken
 	}
 
 	//Validate jsonQuery is valid JSON
 	ffsQuery, err := json.Marshal(query)
 	if err != nil {
-		return nil, nil, errors.New("jsonQuery is not in a valid json format")
+		return nil, "", errors.New("jsonQuery is not in a valid json format")
 	}
 
 	//Make sure authData token is not ""
 	if authData.Data.V3UserToken == "" {
-		return nil, nil, errors.New("authData cannot be nil")
+		return nil, "", errors.New("authData cannot be nil")
 	}
 
 	//Query ffsURI with authData API token and jsonQuery body
@@ -140,7 +141,7 @@ func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken *s
 
 	//Handle request errors
 	if err != nil {
-		return nil, nil, err
+		return nil, "", err
 	}
 
 	//Set request headers
@@ -152,7 +153,7 @@ func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken *s
 
 	//Handle response errors
 	if err != nil {
-		return nil, nil, err
+		return nil, "", err
 	}
 
 	//defer body close
@@ -160,23 +161,23 @@ func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken *s
 
 	//Make sure http status code is 200
 	if resp.StatusCode != http.StatusOK {
-		return nil, nil, errors.New("Error with gathering file events POST: " + resp.Status)
+		return nil, "", errors.New("Error with gathering file events POST: " + resp.Status)
 	}
 
 	fileEventResponse, err := GetJsonFileEventResponse(resp)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, "", err
 	}
 
 	if fileEventResponse.Problems != nil {
 		problems, err := json.Marshal(fileEventResponse.Problems)
 
 		if err != nil {
-			return nil, nil, err
+			return nil, "", err
 		}
 
-		return nil, nil, errors.New(string(problems))
+		return nil, "", errors.New(string(problems))
 	}
 
 	if len(fileEventResponse.FileEvents) == 0 {
@@ -185,31 +186,22 @@ func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken *s
 		jsonFileEvents = append(jsonFileEvents, fileEventResponse.FileEvents...)
 	}
 
-	var nextPgToken *string
-
-	if fileEventResponse.NextPgToken != nil && *fileEventResponse.NextPgToken != "" {
-		nextPgToken = fileEventResponse.NextPgToken
-	}
-
 	var nextJsonFileEvents *[]JsonFileEvent
 
-	for {
-		if nextPgToken == nil || *nextPgToken == "" {
-			break
-		} else {
-			nextJsonFileEvents, nextPgToken, err = GetJsonFileEvents(authData, ffsURI, query, pgToken)
+	if fileEventResponse.NextPgToken != "" {
+		log.Print("Next Page Token: ")
+		log.Println(fileEventResponse.NextPgToken)
 
-			if err != nil {
-				return nil, nil, err
-			}
+		nextJsonFileEvents, _, err = GetJsonFileEvents(authData, ffsURI, query, fileEventResponse.NextPgToken)
 
-			if nextJsonFileEvents != nil && len(*nextJsonFileEvents) != 0 {
-				jsonFileEvents = append(jsonFileEvents, *nextJsonFileEvents...)
-			}
+		if err != nil {
+			return nil, "", err
+		}
 
-			nextJsonFileEvents = nil
+		if nextJsonFileEvents != nil && len(*nextJsonFileEvents) != 0 {
+			jsonFileEvents = append(jsonFileEvents, *nextJsonFileEvents...)
 		}
 	}
 
-	return &jsonFileEvents, nil, nil
+	return &jsonFileEvents, "", nil
 }
