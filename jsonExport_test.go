@@ -19,7 +19,7 @@ func TestGetJsonFileEvents(t *testing.T) {
 	log.Println("Warnings: " + authData.Warnings)
 	log.Println("Auth Token: " + authData.Data.V3UserToken)
 
-	jsonFileEvents, nextPgToken, err := GetJsonFileEvents(*authData, ffsUri, jsonQuery, "")
+	jsonFileEvents, nextPgToken, err := GetJsonFileEvents(*authData, ffsUri, jsonQuery, "", true)
 
 	if err != nil {
 		t.Error(err)
