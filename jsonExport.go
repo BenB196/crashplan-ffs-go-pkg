@@ -68,7 +68,7 @@ type JsonFileEvent struct {
 	SharingTypeAdded           []string     `json:"sharingTypeAdded,omitempty"`
 	Source                     string       `json:"source,omitempty"`
 	SyncDestination            string       `json:"syncDestination,omitempty"`
-	SyncDestinationUsername    string       `json:"syncDestinationUsername,omitempty"`
+	SyncDestinationUsername    []string       `json:"syncDestinationUsername,omitempty"`
 	TabUrl                     string       `json:"tabUrl,omitempty"`
 	Tabs                       []Tab        `json:"tabs,omitempty"`
 	Trusted                    *bool        `json:"trusted,omitempty"`
