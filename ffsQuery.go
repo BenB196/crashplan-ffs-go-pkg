@@ -1,4 +1,4 @@
-package code42
+package ffs
 
 import (
 	"bytes"
