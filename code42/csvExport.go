@@ -1,14 +1,10 @@
-//Packages provide a module for using the Code42 Crashplan FFS API
-package ffs
+package code42
 
 import (
-	"bytes"
 	"encoding/csv"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"github.com/spkg/bom"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -17,8 +13,10 @@ import (
 	"time"
 )
 
-//The main body of a file event record
-type FileEvent struct {
+// FFS CSV Export
+
+//The CSV main body of a file event record
+type CsvFileEvent struct {
 	EventId                     string     `json:"eventId,omitempty"`
 	EventType                   string     `json:"eventType,omitempty"`
 	EventTimestamp              *time.Time `json:"eventTimestamp,omitempty"`
@@ -91,102 +89,14 @@ type FileEvent struct {
 //Currently recognized csv headers
 var csvHeaders = []string{"Event ID", "Event type", "Date Observed (UTC)", "Date Inserted (UTC)", "File path", "Filename", "File type", "File Category", "Identified Extension Category", "Current Extension Category", "File size (bytes)", "File Owner", "MD5 Hash", "SHA-256 Hash", "Create Date", "Modified Date", "Username", "Device ID", "User UID", "Hostname", "Fully Qualified Domain Name", "IP address (public)", "IP address (private)", "Actor", "Directory ID", "Source", "URL", "Shared", "Shared With Users", "File exposure changed to", "Cloud drive ID", "Detection Source Alias", "File Id", "Exposure Type", "Process Owner", "Process Name", "Tab/Window Title", "Tab URL", "Table Titles", "Tab URLs", "Removable Media Vendor", "Removable Media Name", "Removable Media Serial Number", "Removable Media Capacity", "Removable Media Bus Type", "Removable Media Media Name", "Removable Media Volume Name", "Removable Media Partition Id", "Sync Destination", "Sync Destination Username", "Email DLP Policy Names", "Email DLP Subject", "Email DLP Sender", "Email DLP From", "Email DLP Recipients", "Outside Active Hours", "Identified Extension MIME Type", "Current Extension MIME Type", "Suspicious File Type Mismatch", "Print Job Name", "Printer Name", "Printed Files Backup Path", "Remote Activity", "Trusted", "Logged in Operating System User", "Destination Category", "Destination Name"}
 
-//Structs of Crashplan FFS API Authentication Token Return
-type AuthData struct {
-	Data     AuthToken `json:"data"`
-	Error    string    `json:"error,omitempty"`
-	Warnings string    `json:"warnings,omitempty"`
-}
-type AuthToken struct {
-	V3UserToken string `json:"v3_user_token"`
-}
-
-//Structs for FFS Queries
-type Query struct {
-	Groups      []Group `json:"groups"`
-	GroupClause string  `json:"groupClause,omitempty"`
-	PgNum       int     `json:"pgNum,omitempty"`
-	PgSize      int     `json:"pgSize,omitempty"`
-	SrtDir      string  `json:"srtDir,omitempty"`
-	SrtKey      string  `json:"srtKey,omitempty"`
-}
-
-type Group struct {
-	Filters      []Filter `json:"filters"`
-	FilterClause string   `json:"filterClause,omitempty"`
-}
-
-type Filter struct {
-	Operator string `json:"operator"`
-	Term     string `json:"term"`
-	Value    string `json:"value"`
-}
-
 /*
-GetAuthData - Function to get the Authentication data (mainly the authentication token) which will be needed for the rest of the API calls
-The authentication token is good for up to 1 hour before it expires
-*/
-func GetAuthData(uri string, username string, password string) (*AuthData, error) {
-	//Build HTTP GET request
-	req, err := http.NewRequest("GET", uri, nil)
-
-	//Return nil and err if Building of HTTP GET request fails
-	if err != nil {
-		return nil, err
-	}
-
-	//Set Basic Auth Header
-	req.SetBasicAuth(username, password)
-	//Set Accept Header
-	req.Header.Set("Accept", "application/json")
-
-	//Make the HTTP Call
-	resp, err := http.DefaultClient.Do(req)
-
-	//Return nil and err if Building of HTTP GET request fails
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	//Return err if status code != 200
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("Error with Authentication Token GET: " + resp.Status)
-	}
-
-	//Create AuthData variable
-	var authData AuthData
-
-	respData := resp.Body
-
-	responseBytes, _ := ioutil.ReadAll(respData)
-
-	if strings.Contains(string(responseBytes), "Service Under Maintenance") {
-		return nil, errors.New("error: auth api service is under maintenance")
-	}
-
-	//Decode the resp.Body into authData variable
-	err = json.Unmarshal(responseBytes, &authData)
-
-	//Return nil and err if decoding of resp.Body fails
-	if err != nil {
-		return nil, err
-	}
-
-	//Return AuthData
-	return &authData, nil
-}
-
-//TODO create Global Function for calling getFileEvents with CSV url formatting (Priority, as will likely continue to be supported by Code42)
-/*
-csvLineToFileEvent - Converts a CSV Line into a File Event Struct
+csvLineToCsvFileEvent - Converts a CSV Line into a File Event Struct
 []string - csv line. DO NOT PASS Line 0 (Headers) if they exist
 This function contains panics in order to prevent messed up CSV parsing
 */
-func csvLineToFileEvent(csvLine []string) *FileEvent {
+func csvLineToCsvFileEvent(csvLine []string) *CsvFileEvent {
 	//Init variables
-	var fileEvent FileEvent
+	var fileEvent CsvFileEvent
 	var err error
 
 	//set eventId
@@ -591,57 +501,13 @@ func csvLineToFileEvent(csvLine []string) *FileEvent {
 	return &fileEvent
 }
 
-//TODO create Global Function for calling getFileEvents with JSON url formatting (this may be not be needed, Code42 seems to frown upon using this for pulling large amounts of events.)
-
 /*
-getFileEvents - Function to get the actual event records from FFS
-authData - authData struct which contains the authentication API token
-ffsURI - the URI for where to pull the FFS events
-query - query struct which contains the actual FFS query and a golang valid form
+getCsvFileEvents - Function to get the actual event records from FFS
+*http.Response from ExecQuery
 This function contains a panic if the csv columns do not match the currently specified list.
 This is to prevent data from being messed up during parsing.
 */
-func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent, error) {
-
-	//Validate jsonQuery is valid JSON
-	ffsQuery, err := json.Marshal(query)
-	if err != nil {
-		return nil, errors.New("jsonQuery is not in a valid json format")
-	}
-
-	//Make sure authData token is not ""
-	if authData.Data.V3UserToken == "" {
-		return nil, errors.New("authData cannot be nil")
-	}
-
-	//Query ffsURI with authData API token and jsonQuery body
-	req, err := http.NewRequest("POST", ffsURI, bytes.NewReader(ffsQuery))
-
-	//Handle request errors
-	if err != nil {
-		return nil, err
-	}
-
-	//Set request headers
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "v3_user_token "+authData.Data.V3UserToken)
-
-	//Get Response
-	resp, err := http.DefaultClient.Do(req)
-
-	//Handle response errors
-	if err != nil {
-		return nil, err
-	}
-
-	//defer body close
-	defer resp.Body.Close()
-
-	//Make sure http status code is 200
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("Error with gathering file events POST: " + resp.Status)
-	}
-
+func GetCsvFileEvents(resp *http.Response) (*[]CsvFileEvent, error) {
 	//Read Response Body as CSV
 	//reader := csv.NewReader(resp.Body)
 	reader := csv.NewReader(bom.NewReader(resp.Body))
@@ -655,7 +521,7 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent,
 		return nil, err
 	}
 
-	var fileEvents []FileEvent
+	var fileEvents []CsvFileEvent
 
 	//Loop through CSV lines
 	var wg sync.WaitGroup
@@ -664,7 +530,7 @@ func GetFileEvents(authData AuthData, ffsURI string, query Query) (*[]FileEvent,
 		for lineNumber, lineContent := range data {
 			if lineNumber != 0 {
 				//Convert CSV line to file events and add to slice
-				fileEvents = append(fileEvents, *csvLineToFileEvent(lineContent))
+				fileEvents = append(fileEvents, *csvLineToCsvFileEvent(lineContent))
 			} else {
 				//Validate that the columns have not changed
 				err = equal(lineContent, csvHeaders)
