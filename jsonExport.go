@@ -118,7 +118,7 @@ func GetJsonFileEventResponse(resp *http.Response) (*JsonFileEventResponse, erro
 	return &eventResponse, nil
 }
 
-func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken string) (*[]JsonFileEvent, string, error) {
+func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken string, debugging bool) (*[]JsonFileEvent, string, error) {
 	var jsonFileEvents []JsonFileEvent
 
 	if pgToken != "" {
@@ -189,10 +189,12 @@ func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken st
 	var nextJsonFileEvents *[]JsonFileEvent
 
 	if fileEventResponse.NextPgToken != "" {
-		log.Print("Next Page Token: ")
-		log.Println(fileEventResponse.NextPgToken)
+		if debugging {
+			log.Print("Next Page Token: ")
+			log.Println(fileEventResponse.NextPgToken)
+		}
 
-		nextJsonFileEvents, _, err = GetJsonFileEvents(authData, ffsURI, query, fileEventResponse.NextPgToken)
+		nextJsonFileEvents, _, err = GetJsonFileEvents(authData, ffsURI, query, fileEventResponse.NextPgToken, debugging)
 
 		if err != nil {
 			return nil, "", err
