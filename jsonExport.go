@@ -83,7 +83,7 @@ type FieldError struct {
 }
 
 type SharedWith struct {
-	CloudUsername string `json:"cloudUsername,omitempty"`
+	CloudUsername *string `json:"cloudUsername,omitempty"`
 }
 
 type Tab struct {
