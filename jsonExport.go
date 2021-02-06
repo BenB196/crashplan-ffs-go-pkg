@@ -64,7 +64,7 @@ type JsonFileEvent struct {
 	RemovableMediaVolumeName   []string     `json:"removableMediaVolumeName,omitempty"`
 	Sha256Checksum             string       `json:"sha256Checksum,omitempty"`
 	Shared                     string       `json:"shared,omitempty"`
-	SharedWith                 *SharedWith  `json:"sharedWith,omitempty"`
+	SharedWith                 []SharedWith  `json:"sharedWith,omitempty"`
 	SharingTypeAdded           []string     `json:"sharingTypeAdded,omitempty"`
 	Source                     string       `json:"source,omitempty"`
 	SyncDestination            string       `json:"syncDestination,omitempty"`
