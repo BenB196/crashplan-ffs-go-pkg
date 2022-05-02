@@ -17,7 +17,7 @@ func TestGetJsonFileEvents(t *testing.T) {
 	}
 
 	log.Println("Warnings: " + authData.Warnings)
-	log.Println("Auth Token: " + authData.Data.V3UserToken)
+	log.Println("Auth Token: " + authData.AccessToken)
 
 	jsonFileEvents, nextPgToken, err := GetJsonFileEvents(*authData, ffsUri, jsonQuery, "", true)
 
