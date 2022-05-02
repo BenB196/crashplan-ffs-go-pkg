@@ -17,5 +17,5 @@ func TestGetAuthData(t *testing.T) {
 	}
 
 	log.Println("Warnings: " + authData.Warnings)
-	log.Println("Auth Token: " + authData.Data.V3UserToken)
+	log.Println("Auth Token: " + authData.AccessToken)
 }

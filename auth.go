@@ -10,14 +10,13 @@ import (
 
 // Code42 Auth
 
-//Structs of Crashplan FFS API Authentication Token Return
+// AuthData Structs of Crashplan FFS API Authentication Token Return
 type AuthData struct {
-	Data     AuthToken `json:"data"`
-	Error    string    `json:"error,omitempty"`
-	Warnings string    `json:"warnings,omitempty"`
-}
-type AuthToken struct {
-	V3UserToken string `json:"v3_user_token"`
+	AccessToken string `json:"access_token"`
+	Error       string `json:"error,omitempty"`
+	Warnings    string `json:"warnings,omitempty"`
+	TokenType   string `json:"token_type,omitempty"`
+	ExpiresIn   *int   `json:"expires_in,omitempty"`
 }
 
 /*
@@ -26,7 +25,7 @@ The authentication token is good for up to 1 hour before it expires
 */
 func GetAuthData(uri string, username string, password string) (*AuthData, error) {
 	//Build HTTP GET request
-	req, err := http.NewRequest("GET", uri, nil)
+	req, err := http.NewRequest("POST", uri, nil)
 
 	//Return nil and err if Building of HTTP GET request fails
 	if err != nil {

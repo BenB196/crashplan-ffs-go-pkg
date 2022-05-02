@@ -132,7 +132,7 @@ func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken st
 	}
 
 	//Make sure authData token is not ""
-	if authData.Data.V3UserToken == "" {
+	if authData.AccessToken == "" {
 		return nil, "", errors.New("authData cannot be nil")
 	}
 
@@ -146,7 +146,7 @@ func GetJsonFileEvents(authData AuthData, ffsURI string, query Query, pgToken st
 
 	//Set request headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "v3_user_token "+authData.Data.V3UserToken)
+	req.Header.Set("Authorization", "Bearer  "+authData.AccessToken)
 
 	//Get Response
 	resp, err := http.DefaultClient.Do(req)

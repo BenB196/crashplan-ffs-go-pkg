@@ -517,7 +517,7 @@ func GetCsvFileEvents(authData AuthData, ffsURI string, query Query) (*[]CsvFile
 	}
 
 	//Make sure authData token is not ""
-	if authData.Data.V3UserToken == "" {
+	if authData.AccessToken == "" {
 		return nil, errors.New("authData cannot be nil")
 	}
 
@@ -531,7 +531,7 @@ func GetCsvFileEvents(authData AuthData, ffsURI string, query Query) (*[]CsvFile
 
 	//Set request headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "v3_user_token "+authData.Data.V3UserToken)
+	req.Header.Set("Authorization", "Bearer "+authData.AccessToken)
 
 	//Get Response
 	resp, err := http.DefaultClient.Do(req)
@@ -601,7 +601,7 @@ func equal(slice1 []string, slice2 []string) error {
 
 	//loop through slices to check values
 	for i, v := range slice1 {
-		if i == len(slice1) - 1 {
+		if i == len(slice1)-1 {
 			//if last element in slice1, remove potential eol char
 			v = strings.Replace(v, "\r\n", "", -1)
 			v = strings.Replace(v, "\r", "", -1)
